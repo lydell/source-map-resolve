@@ -1,6 +1,6 @@
 {
   "name": "source-map-resolve",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Resolve the source map and/or sources for a generated file.",
   "authors": ["Simon Lydell"],
   "license": "MIT",
