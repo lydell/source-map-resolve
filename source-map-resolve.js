@@ -168,12 +168,17 @@ void (function(root, factory) {
     return sources
   }
 
+  var endingSlash = /\/?$/
+
   function resolveSourcesHelper(map, mapUrl, fn) {
     var fullUrl
     var sourceContent
     for (var index = 0, len = map.sources.length; index < len; index++) {
       if (map.sourceRoot) {
-        fullUrl = resolveUrl(mapUrl, map.sourceRoot, map.sources[index])
+        // Make sure that the sourceRoot ends with a slash, so that `/scripts/subdir` becomes
+        // `/scripts/subdir/<source>`, not `/script/<source>`. Pointing to a file as source root
+        // does not make sense.
+        fullUrl = resolveUrl(mapUrl, map.sourceRoot.replace(endingSlash, "/"), map.sources[index])
       } else {
         fullUrl = resolveUrl(mapUrl, map.sources[index])
       }

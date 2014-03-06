@@ -29,6 +29,12 @@ var map = {
     sources:    ["foo.js", "lib/bar.js", "../vendor/dom.js", "/version.js", "//foo.org/baz.js"],
     names:      []
   },
+  sourceRootNoSlash: {
+    mappings:   "AAAA",
+    sourceRoot: "/static/js/app",
+    sources:    ["foo.js", "lib/bar.js", "../vendor/dom.js", "/version.js", "//foo.org/baz.js"],
+    names:      []
+  },
   sourceContents: {
     mappings:       "AAAA",
     sourceRoot:     "/static/js/app/",
@@ -270,7 +276,7 @@ function testResolveSources(method, sync) {
 
     var mapUrl = "http://example.com/a/b/c/foo.js.map"
 
-    t.plan(1 + (sync ? 8 : 11) + 5*3 + 4)
+    t.plan(1 + (sync ? 8 : 11) + 6*3 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -310,6 +316,18 @@ function testResolveSources(method, sync) {
         "http://example.com/version.js",
         "http://foo.org/baz.js"
       ], "sourceRoot")
+      isAsync()
+    })
+
+    method(map.sourceRootNoSlash, mapUrl, wrap(identity), function(error, result) {
+      t.error(error)
+      t.deepEqual(result, [
+        "http://example.com/static/js/app/foo.js",
+        "http://example.com/static/js/app/lib/bar.js",
+        "http://example.com/static/js/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "sourceRootNoSlash")
       isAsync()
     })
 
@@ -375,7 +393,7 @@ function testResolve(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + (sync ? 7 : 10) + 16*3 + 5*3 + 4)
+    t.plan(1 + (sync ? 7 : 10) + 16*3 + 6*3 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -578,6 +596,18 @@ function testResolve(method, sync) {
         "http://example.com/version.js",
         "http://foo.org/baz.js"
       ], "sourceRoot")
+      isAsync()
+    })
+
+    method(code.fileRelative, codeUrl, readMap(map.sourceRootNoSlash), function(error, result) {
+      t.error(error)
+      t.deepEqual(result.sources, [
+        "http://example.com/static/js/app/foo.js",
+        "http://example.com/static/js/app/lib/bar.js",
+        "http://example.com/static/js/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "sourceRootNoSlash")
       isAsync()
     })
 
