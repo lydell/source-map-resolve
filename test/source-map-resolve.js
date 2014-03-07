@@ -13,7 +13,9 @@ var sourceMapResolve = require("../")
 
 // Polyfills.
 require("setimmediate")
-require("Base64")
+if (typeof window !== "undefined" && !window.atob) {
+  window.atob = require("Base64").atob
+}
 
 "use strict"
 

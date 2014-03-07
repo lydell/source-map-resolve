@@ -39,6 +39,7 @@
     "after": false,
     "afterEach": false,
     "define": false,
+    "window": false,
     "atob": true
   }
 }
