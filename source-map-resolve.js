@@ -50,6 +50,10 @@ void (function(root, factory) {
     }
   }
 
+  function parseMapToJSON(string) {
+    return JSON.parse(string.replace(/^\)\]\}'/, ""))
+  }
+
 
 
   function resolveSourceMap(code, codeUrl, read, callback) {
@@ -68,7 +72,7 @@ void (function(root, factory) {
         return callback(error)
       }
       try {
-        mapData.map = JSON.parse(String(result))
+        mapData.map = parseMapToJSON(String(result))
       } catch (error) {
         return callback(error)
       }
@@ -82,7 +86,7 @@ void (function(root, factory) {
     if (!mapData || mapData.map) {
       return mapData
     }
-    mapData.map = JSON.parse(String(read(mapData.url)))
+    mapData.map = parseMapToJSON(String(read(mapData.url)))
     return mapData
   }
 
@@ -107,7 +111,7 @@ void (function(root, factory) {
         sourceMappingURL: url,
         url: null,
         sourcesRelativeTo: codeUrl,
-        map: JSON.parse(lastParameter === ";base64" ? atob(encoded) : decodeURIComponent(encoded))
+        map: parseMapToJSON(lastParameter === ";base64" ? atob(encoded) : decodeURIComponent(encoded))
       }
     }
 
@@ -176,7 +180,7 @@ void (function(root, factory) {
     for (var index = 0, len = map.sources.length; index < len; index++) {
       if (map.sourceRoot) {
         // Make sure that the sourceRoot ends with a slash, so that `/scripts/subdir` becomes
-        // `/scripts/subdir/<source>`, not `/script/<source>`. Pointing to a file as source root
+        // `/scripts/subdir/<source>`, not `/scripts/<source>`. Pointing to a file as source root
         // does not make sense.
         fullUrl = resolveUrl(mapUrl, map.sourceRoot.replace(endingSlash, "/"), map.sources[index])
       } else {

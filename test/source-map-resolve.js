@@ -52,6 +52,7 @@ var map = {
   }
 }
 map.simpleString = JSON.stringify(map.simple)
+map.XSSIsafe = ")]}'" + map.simpleString
 
 var code = {
   fileRelative:       u("foo.js.map"),
@@ -72,6 +73,9 @@ var code = {
   dataUriNoMime:      u("data:,foo"),
   dataUriInvalidMime: u("data:text/html,foo"),
   dataUriInvalidJSON: u("data:application/json,foo"),
+  dataUriXSSIsafe:    u("data:application/json," + ")%5D%7D%27" +
+                        "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
+                        "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D"),
   dataUriEmpty:       u("data:"),
   noMap:              ""
 }
@@ -90,7 +94,7 @@ function testResolveSourceMap(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + (sync ? 7 : 10) + 16*3)
+    t.plan(1 + (sync ? 7 : 10) + 18*3)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -228,6 +232,19 @@ function testResolveSourceMap(method, sync) {
       isAsync()
     })
 
+    method(code.dataUriXSSIsafe, codeUrl, wrap(Throws), function(error, result) {
+      t.error(error)
+      t.deepEqual(result, {
+        sourceMappingURL:  "data:application/json," + ")%5D%7D%27" +
+                           "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
+                           "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D",
+        url:               null,
+        sourcesRelativeTo: codeUrl,
+        map:               map.simple
+      }, "dataUriXSSIsafe")
+      isAsync()
+    })
+
     method(code.dataUriEmpty, codeUrl, wrap(Throws), function(error, result) {
       t.ok(error.message.match(/mime type.+text\/plain/), "dataUriEmpty")
       t.notOk(result)
@@ -254,6 +271,17 @@ function testResolveSourceMap(method, sync) {
     method(code.absolute, codeUrl, wrap(read("invalid JSON")), function(error, result) {
       t.ok(error instanceof SyntaxError, "read invalid JSON")
       t.notOk(result)
+      isAsync()
+    })
+
+    method(code.absolute, codeUrl, wrap(read(map.XSSIsafe)), function(error, result) {
+      t.error(error)
+      t.deepEqual(result, {
+        sourceMappingURL:  "https://foo.org/foo.js.map",
+        url:               "https://foo.org/foo.js.map",
+        sourcesRelativeTo: "https://foo.org/foo.js.map",
+        map:               map.simple
+      }, "XSSIsafe map")
       isAsync()
     })
 
@@ -395,7 +423,7 @@ function testResolve(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + (sync ? 7 : 10) + 16*3 + 6*3 + 4)
+    t.plan(1 + (sync ? 7 : 10) + 18*3 + 6*3 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -543,6 +571,20 @@ function testResolve(method, sync) {
       isAsync()
     })
 
+    method(code.dataUriXSSIsafe, codeUrl, wrapMap(Throws, identity), function(error, result) {
+      t.error(error)
+      t.deepEqual(result, {
+        sourceMappingURL:  "data:application/json," + ")%5D%7D%27" +
+                           "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
+                           "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D",
+        url:               null,
+        sourcesRelativeTo: codeUrl,
+        map:               map.simple,
+        sources:           ["http://example.com/a/b/c/foo.js"]
+      }, "dataUriXSSIsafe")
+      isAsync()
+    })
+
     method(code.dataUriEmpty, codeUrl, wrap(Throws), function(error, result) {
       t.ok(error.message.match(/mime type.+text\/plain/), "dataUriEmpty")
       t.notOk(result)
@@ -570,6 +612,18 @@ function testResolve(method, sync) {
     method(code.absolute, codeUrl, wrap(read("invalid JSON")), function(error, result) {
       t.ok(error instanceof SyntaxError, "read invalid JSON")
       t.notOk(result)
+      isAsync()
+    })
+
+    method(code.absolute, codeUrl, wrapMap(read(map.XSSIsafe), identity), function(error, result) {
+      t.error(error)
+      t.deepEqual(result, {
+        sourceMappingURL:  "https://foo.org/foo.js.map",
+        url:               "https://foo.org/foo.js.map",
+        sourcesRelativeTo: "https://foo.org/foo.js.map",
+        map:               map.simple,
+        sources:           ["https://foo.org/foo.js"]
+      }, "XSSIsafe map")
       isAsync()
     })
 
