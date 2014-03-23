@@ -1,15 +1,16 @@
 {
   "name": "source-map-resolve",
   "version": "0.1.1",
+  "author": "Simon Lydell",
   "license": "MIT",
   "description": "Resolve the source map and/or sources for a generated file.",
-  "main": "source-map-resolve.js",
-  "repo": "lydell/source-map-resolve",
   "keywords": [
     "source map",
     "sourceMappingURL",
     "resolve"
   ],
+  "repo": "lydell/source-map-resolve",
+  "main": "source-map-resolve.js",
   "scripts": [
     "source-map-resolve.js"
   ],

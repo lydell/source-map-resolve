@@ -1,17 +1,17 @@
 {
   "name": "source-map-resolve",
   "version": "0.1.1",
-  "description": "Resolve the source map and/or sources for a generated file.",
   "author": "Simon Lydell",
   "license": "MIT",
-  "main": "lib/source-map-resolve-node.js",
-  "browser": "source-map-resolve.js",
-  "repository": "lydell/source-map-resolve",
+  "description": "Resolve the source map and/or sources for a generated file.",
   "keywords": [
     "source map",
     "sourceMappingURL",
     "resolve"
   ],
+  "repository": "lydell/source-map-resolve",
+  "main": "lib/source-map-resolve-node.js",
+  "browser": "source-map-resolve.js",
   "scripts": {
     "test": "jshint *.js lib/ test/ && node test/source-map-resolve.js && node test/windows.js"
   },
