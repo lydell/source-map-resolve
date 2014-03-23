@@ -13,7 +13,7 @@
   "main": "lib/source-map-resolve-node.js",
   "browser": "source-map-resolve.js",
   "scripts": {
-    "test": "jshint *.js lib/ test/ && node test/source-map-resolve.js && node test/windows.js"
+    "test": "jshint lib/ test/ && node test/source-map-resolve.js && node test/windows.js"
   },
   "dependencies": {
     "source-map-url": "~0.2.0",
