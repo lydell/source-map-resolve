@@ -6,8 +6,16 @@
   description: "Resolve the source map and/or sources for a generated file.",
   keywords: [
     "source map",
+    "sourcemap",
+    "source",
+    "map",
     "sourceMappingURL",
-    "resolve"
+    "resolve",
+    "resolver",
+    "locate",
+    "locator",
+    "find",
+    "finder"
   ],
   overlay: {
     npm: {
