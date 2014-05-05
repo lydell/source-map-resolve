@@ -18,6 +18,7 @@
   "dependencies": {
     "source-map-url": "~0.2.0",
     "atob": "~1.1.0",
+    "resolve-url": "~0.2.1",
     "urix": "~0.1.0"
   },
   "devDependencies": {
@@ -25,7 +26,6 @@
     "jshint": "~2.4.3",
     "setimmediate": "~1.0.1",
     "Base64": "~0.2.0",
-    "resolve-url": "~0.2.1",
     "simple-asyncify": "~0.1.0"
   },
   "testling": {
