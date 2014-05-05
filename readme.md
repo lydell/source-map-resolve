@@ -141,12 +141,34 @@ to the async versions, except:
 - They throw errors and return the result instead of using a callback.
 
 
+Development
+===========
+
 Tests
-=====
+-----
 
-Start by running `npm test`, which lints the code and runs the test suite in Node.js.
+First off, run `npm install` to install testing modules and browser polyfills.
 
-To run the tests in a browser, run `testling` (`npm install -g testling`) or `testling -u`.
+`npm test` lints the code and runs the test suite in Node.js.
+
+To run the tests in a browser, run `testling` (`npm install -g testling`) or
+`testling -u`.
+
+x-package.json5
+---------------
+
+package.json, component.json and bower.json are all generated from
+x-package.json5 by using [`xpkg`]. Only edit x-package.json5, and remember to
+run `xpkg` before commiting!
+
+[`xpkg`]: https://github.com/kof/node-xpkg
+
+Generating the browser version
+------------------------------
+
+source-map-resolve.js is generated from source-map-resolve-node.js and
+source-map-resolve-template.js. Only edit the two latter files, _not_
+source-map-resolve.js! To generate it, run `node generate-source-map-resolve.js`
 
 
 License
