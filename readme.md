@@ -141,6 +141,17 @@ to the async versions, except:
 - They throw errors and return the result instead of using a callback.
 
 
+Note
+====
+
+This module resolves the source map for a given generated file by looking for a
+sourceMappingURL comment. The spec defines yet a way to provide the URL to the
+source map: By sending the `SourceMap: <url>` header along with the generated
+file. Since this module doesn’t retrive the generated code for you (instead
+_you_ give the generated code to the module), it’s up to you to look for such a
+header when you retrieve the file (should the need arise).
+
+
 Development
 ===========
 
