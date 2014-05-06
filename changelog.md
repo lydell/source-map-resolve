@@ -1,3 +1,8 @@
+### Version 0.1.3 (2014-05-06) ###
+
+- Only documentation and meta-data changes.
+
+
 ### Version 0.1.2 (2014-03-23) ###
 
 - Improved: Source maps starting with `)]}'` are now parsed correctly. The spec
