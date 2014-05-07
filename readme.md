@@ -104,7 +104,7 @@ The result is an object with the following properties:
 
 If `code` contains no sourceMappingURL, the result is `null`.
 
-### `sourceMapResolve.resolveSourceSources(map, mapUrl, read, callback)` ###
+### `sourceMapResolve.resolveSources(map, mapUrl, read, callback)` ###
 
 - `map` is a source map, as an object (not a string).
 - `mapUrl` is the url to the file containing `map`. Relative sources in the
