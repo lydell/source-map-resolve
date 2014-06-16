@@ -1,3 +1,10 @@
+### Version 0.1.4 (2014-06-16) ###
+
+- Fixed: `sourcesContent` was mis-typed as `sourceContents`, which meant that
+  the `sourcesContent` property of source maps never was used when resolving
+  sources.
+
+
 ### Version 0.1.3 (2014-05-06) ###
 
 - Only documentation and meta-data changes.
