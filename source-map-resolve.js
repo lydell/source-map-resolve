@@ -186,7 +186,7 @@ void (function(root, factory) {
       } else {
         fullUrl = resolveUrl(mapUrl, map.sources[index])
       }
-      sourceContent = (map.sourceContents || [])[index]
+      sourceContent = (map.sourcesContent || [])[index]
       fn(fullUrl, sourceContent, index)
     }
   }

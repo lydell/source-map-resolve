@@ -37,17 +37,17 @@ var map = {
     sources:    ["foo.js", "lib/bar.js", "../vendor/dom.js", "/version.js", "//foo.org/baz.js"],
     names:      []
   },
-  sourceContents: {
+  sourcesContent: {
     mappings:       "AAAA",
     sourceRoot:     "/static/js/app/",
     sources:        ["foo.js", "lib/bar.js", "../vendor/dom.js", "/version.js", "//foo.org/baz.js"],
-    sourceContents: ["foo.js", "lib/bar.js", "../vendor/dom.js", "/version.js", "//foo.org/baz.js"],
+    sourcesContent: ["foo.js", "lib/bar.js", "../vendor/dom.js", "/version.js", "//foo.org/baz.js"],
     names:          []
   },
   mixed: {
     mappings:       "AAAA",
     sources:        ["foo.js", "lib/bar.js", "../vendor/dom.js", "/version.js", "//foo.org/baz.js"],
-    sourceContents: ["foo.js", null        , null              , "/version.js", "//foo.org/baz.js"],
+    sourcesContent: ["foo.js", null        , null              , "/version.js", "//foo.org/baz.js"],
     names:          []
   }
 }
@@ -361,7 +361,7 @@ function testResolveSources(method, sync) {
       isAsync()
     })
 
-    method(map.sourceContents, mapUrl, wrap(Throws), function(error, result) {
+    method(map.sourcesContent, mapUrl, wrap(Throws), function(error, result) {
       t.error(error)
       t.deepEqual(result, [
         "foo.js",
@@ -369,7 +369,7 @@ function testResolveSources(method, sync) {
         "../vendor/dom.js",
         "/version.js",
         "//foo.org/baz.js"
-      ], "sourceContents")
+      ], "sourcesContent")
       isAsync()
     })
 
@@ -667,7 +667,7 @@ function testResolve(method, sync) {
       isAsync()
     })
 
-    method(code.fileRelative, codeUrl, readMap(map.sourceContents), function(error, result) {
+    method(code.fileRelative, codeUrl, readMap(map.sourcesContent), function(error, result) {
       t.error(error)
       t.deepEqual(result.sources, [
         "foo.js",
@@ -675,7 +675,7 @@ function testResolve(method, sync) {
         "../vendor/dom.js",
         "/version.js",
         "//foo.org/baz.js"
-      ], "sourceContents")
+      ], "sourcesContent")
       isAsync()
     })
 

@@ -47,7 +47,7 @@ sourceMapResolve.resolve(code, "/js/foo.js", fs.readFile, function(error, result
   //   sourceMappingURL: "foo.js.map",
   //   sources: ["<contents of /coffee/foo.coffee>"]
   // }
-  result.map.sourceContents = result.sources
+  result.map.sourcesContent = result.sources
   var map = new sourceMap.sourceMapConsumer(result.map)
   map.sourceContentFor("/coffee/foo.coffee")
   // "<contents of /coffee/foo.coffee>"
