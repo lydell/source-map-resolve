@@ -333,61 +333,103 @@ function testResolveSources(method, sync) {
 
     method(map.simple, mapUrl, wrap(identity), function(error, result) {
       t.error(error)
-      t.deepEqual(result, ["http://example.com/a/b/c/foo.js"], "simple")
+      t.deepEqual(result, {
+        sourcesResolved: ["http://example.com/a/b/c/foo.js"],
+        sourcesContent:  ["http://example.com/a/b/c/foo.js"]
+      }, "simple")
       isAsync()
     })
 
     method(map.sourceRoot, mapUrl, wrap(identity), function(error, result) {
       t.error(error)
-      t.deepEqual(result, [
-        "http://example.com/static/js/app/foo.js",
-        "http://example.com/static/js/app/lib/bar.js",
-        "http://example.com/static/js/vendor/dom.js",
-        "http://example.com/version.js",
-        "http://foo.org/baz.js"
-      ], "sourceRoot")
+      t.deepEqual(result, {
+        sourcesResolved: [
+          "http://example.com/static/js/app/foo.js",
+          "http://example.com/static/js/app/lib/bar.js",
+          "http://example.com/static/js/vendor/dom.js",
+          "http://example.com/version.js",
+          "http://foo.org/baz.js"
+        ],
+        sourcesContent: [
+          "http://example.com/static/js/app/foo.js",
+          "http://example.com/static/js/app/lib/bar.js",
+          "http://example.com/static/js/vendor/dom.js",
+          "http://example.com/version.js",
+          "http://foo.org/baz.js"
+        ]
+      }, "sourceRoot")
       isAsync()
     })
 
     method(map.sourceRootNoSlash, mapUrl, wrap(identity), function(error, result) {
       t.error(error)
-      t.deepEqual(result, [
-        "http://example.com/static/js/app/foo.js",
-        "http://example.com/static/js/app/lib/bar.js",
-        "http://example.com/static/js/vendor/dom.js",
-        "http://example.com/version.js",
-        "http://foo.org/baz.js"
-      ], "sourceRootNoSlash")
+      t.deepEqual(result, {
+        sourcesResolved: [
+          "http://example.com/static/js/app/foo.js",
+          "http://example.com/static/js/app/lib/bar.js",
+          "http://example.com/static/js/vendor/dom.js",
+          "http://example.com/version.js",
+          "http://foo.org/baz.js"
+        ],
+        sourcesContent: [
+          "http://example.com/static/js/app/foo.js",
+          "http://example.com/static/js/app/lib/bar.js",
+          "http://example.com/static/js/vendor/dom.js",
+          "http://example.com/version.js",
+          "http://foo.org/baz.js"
+        ]
+      }, "sourceRootNoSlash")
       isAsync()
     })
 
     method(map.sourcesContent, mapUrl, wrap(Throws), function(error, result) {
       t.error(error)
-      t.deepEqual(result, [
-        "foo.js",
-        "lib/bar.js",
-        "../vendor/dom.js",
-        "/version.js",
-        "//foo.org/baz.js"
-      ], "sourcesContent")
+      t.deepEqual(result, {
+        sourcesResolved: [
+          "http://example.com/static/js/app/foo.js",
+          "http://example.com/static/js/app/lib/bar.js",
+          "http://example.com/static/js/vendor/dom.js",
+          "http://example.com/version.js",
+          "http://foo.org/baz.js"
+        ],
+        sourcesContent: [
+          "foo.js",
+          "lib/bar.js",
+          "../vendor/dom.js",
+          "/version.js",
+          "//foo.org/baz.js"
+        ]
+      }, "sourcesContent")
       isAsync()
     })
 
     method(map.mixed, mapUrl, wrap(identity), function(error, result) {
       t.error(error)
-      t.deepEqual(result, [
-        "foo.js",
-        "http://example.com/a/b/c/lib/bar.js",
-        "http://example.com/a/b/vendor/dom.js",
-        "/version.js",
-        "//foo.org/baz.js"
-      ], "mixed")
+      t.deepEqual(result, {
+        sourcesResolved: [
+          "http://example.com/a/b/c/foo.js",
+          "http://example.com/a/b/c/lib/bar.js",
+          "http://example.com/a/b/vendor/dom.js",
+          "http://example.com/version.js",
+          "http://foo.org/baz.js"
+        ],
+        sourcesContent: [
+          "foo.js",
+          "http://example.com/a/b/c/lib/bar.js",
+          "http://example.com/a/b/vendor/dom.js",
+          "/version.js",
+          "//foo.org/baz.js"
+        ]
+      }, "mixed")
       isAsync()
     })
 
     method(map.simple, mapUrl, wrap(read(["non", "string"])), function(error, result) {
       t.error(error)
-      t.deepEqual(result, ["non,string"], "read non-string")
+      t.deepEqual(result, {
+        sourcesResolved: ["http://example.com/a/b/c/foo.js"],
+        sourcesContent:  ["non,string"]
+      }, "read non-string")
       isAsync()
     })
 
@@ -423,7 +465,7 @@ function testResolve(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + (sync ? 7 : 10) + 18*3 + 6*3 + 4)
+    t.plan(1 + (sync ? 7 : 10) + 18*3 + 6*4 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -456,7 +498,8 @@ function testResolve(method, sync) {
         url:               "http://example.com/a/b/c/foo.js.map",
         sourcesRelativeTo: "http://example.com/a/b/c/foo.js.map",
         map:               map.simple,
-        sources:           ["http://example.com/a/b/c/foo.js"]
+        sourcesResolved:   ["http://example.com/a/b/c/foo.js"],
+        sourcesContent:    ["http://example.com/a/b/c/foo.js"]
       }, "fileRelative")
       isAsync()
     })
@@ -468,7 +511,8 @@ function testResolve(method, sync) {
         url:               "http://example.com/foo.js.map",
         sourcesRelativeTo: "http://example.com/foo.js.map",
         map:               map.simple,
-        sources:           ["http://example.com/foo.js"]
+        sourcesResolved:   ["http://example.com/foo.js"],
+        sourcesContent:    ["http://example.com/foo.js"]
       }, "domainRelative")
       isAsync()
     })
@@ -480,7 +524,8 @@ function testResolve(method, sync) {
         url:               "http://foo.org/foo.js.map",
         sourcesRelativeTo: "http://foo.org/foo.js.map",
         map:               map.simple,
-        sources:           ["http://foo.org/foo.js"]
+        sourcesResolved:   ["http://foo.org/foo.js"],
+        sourcesContent:    ["http://foo.org/foo.js"]
       }, "schemeRelative")
       isAsync()
     })
@@ -492,7 +537,8 @@ function testResolve(method, sync) {
         url:               "https://foo.org/foo.js.map",
         sourcesRelativeTo: "https://foo.org/foo.js.map",
         map:               map.simple,
-        sources:           ["https://foo.org/foo.js"]
+        sourcesResolved:   ["https://foo.org/foo.js"],
+        sourcesContent:    ["https://foo.org/foo.js"]
       }, "absolute")
       isAsync()
     })
@@ -506,7 +552,8 @@ function testResolve(method, sync) {
         url:               null,
         sourcesRelativeTo: codeUrl,
         map:               map.simple,
-        sources:           ["http://example.com/a/b/c/foo.js"]
+        sourcesResolved:   ["http://example.com/a/b/c/foo.js"],
+        sourcesContent:    ["http://example.com/a/b/c/foo.js"]
       }, "dataUri")
       isAsync()
     })
@@ -519,7 +566,8 @@ function testResolve(method, sync) {
         url:               null,
         sourcesRelativeTo: codeUrl,
         map:               map.simple,
-        sources:           ["http://example.com/a/b/c/foo.js"]
+        sourcesResolved:   ["http://example.com/a/b/c/foo.js"],
+        sourcesContent:    ["http://example.com/a/b/c/foo.js"]
       }, "base64")
       isAsync()
     })
@@ -533,7 +581,8 @@ function testResolve(method, sync) {
         url:               null,
         sourcesRelativeTo: codeUrl,
         map:               map.simple,
-        sources:           ["http://example.com/a/b/c/foo.js"]
+        sourcesResolved:   ["http://example.com/a/b/c/foo.js"],
+        sourcesContent:    ["http://example.com/a/b/c/foo.js"]
       }, "dataUriText")
       isAsync()
     })
@@ -547,7 +596,8 @@ function testResolve(method, sync) {
         url:               null,
         sourcesRelativeTo: codeUrl,
         map:               map.simple,
-        sources:           ["http://example.com/a/b/c/foo.js"]
+        sourcesResolved:   ["http://example.com/a/b/c/foo.js"],
+        sourcesContent:    ["http://example.com/a/b/c/foo.js"]
       }, "dataUriParameter")
       isAsync()
     })
@@ -580,7 +630,8 @@ function testResolve(method, sync) {
         url:               null,
         sourcesRelativeTo: codeUrl,
         map:               map.simple,
-        sources:           ["http://example.com/a/b/c/foo.js"]
+        sourcesResolved:   ["http://example.com/a/b/c/foo.js"],
+        sourcesContent:    ["http://example.com/a/b/c/foo.js"]
       }, "dataUriXSSIsafe")
       isAsync()
     })
@@ -604,7 +655,8 @@ function testResolve(method, sync) {
         url:               "https://foo.org/foo.js.map",
         sourcesRelativeTo: "https://foo.org/foo.js.map",
         map:               map.simple,
-        sources:           [map.simpleString]
+        sourcesResolved:   ["https://foo.org/foo.js"],
+        sourcesContent:    [map.simpleString]
       }, "read non-string")
       isAsync()
     })
@@ -622,7 +674,8 @@ function testResolve(method, sync) {
         url:               "https://foo.org/foo.js.map",
         sourcesRelativeTo: "https://foo.org/foo.js.map",
         map:               map.simple,
-        sources:           ["https://foo.org/foo.js"]
+        sourcesResolved:   ["https://foo.org/foo.js"],
+        sourcesContent:    ["https://foo.org/foo.js"]
       }, "XSSIsafe map")
       isAsync()
     })
@@ -639,13 +692,21 @@ function testResolve(method, sync) {
 
     method(code.fileRelative, codeUrl, readMap(map.simple), function(error, result) {
       t.error(error)
-      t.deepEqual(result.sources, ["http://example.com/a/b/c/foo.js"], "simple")
+      t.deepEqual(result.sourcesResolved, ["http://example.com/a/b/c/foo.js"], "simple")
+      t.deepEqual(result.sourcesContent,  ["http://example.com/a/b/c/foo.js"], "simple")
       isAsync()
     })
 
     method(code.fileRelative, codeUrl, readMap(map.sourceRoot), function(error, result) {
       t.error(error)
-      t.deepEqual(result.sources, [
+      t.deepEqual(result.sourcesResolved, [
+        "http://example.com/static/js/app/foo.js",
+        "http://example.com/static/js/app/lib/bar.js",
+        "http://example.com/static/js/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "sourceRoot")
+      t.deepEqual(result.sourcesContent, [
         "http://example.com/static/js/app/foo.js",
         "http://example.com/static/js/app/lib/bar.js",
         "http://example.com/static/js/vendor/dom.js",
@@ -657,7 +718,14 @@ function testResolve(method, sync) {
 
     method(code.fileRelative, codeUrl, readMap(map.sourceRootNoSlash), function(error, result) {
       t.error(error)
-      t.deepEqual(result.sources, [
+      t.deepEqual(result.sourcesResolved, [
+        "http://example.com/static/js/app/foo.js",
+        "http://example.com/static/js/app/lib/bar.js",
+        "http://example.com/static/js/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "sourceRootNoSlash")
+      t.deepEqual(result.sourcesContent, [
         "http://example.com/static/js/app/foo.js",
         "http://example.com/static/js/app/lib/bar.js",
         "http://example.com/static/js/vendor/dom.js",
@@ -669,7 +737,14 @@ function testResolve(method, sync) {
 
     method(code.fileRelative, codeUrl, readMap(map.sourcesContent), function(error, result) {
       t.error(error)
-      t.deepEqual(result.sources, [
+      t.deepEqual(result.sourcesResolved, [
+        "http://example.com/static/js/app/foo.js",
+        "http://example.com/static/js/app/lib/bar.js",
+        "http://example.com/static/js/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "sourcesContent")
+      t.deepEqual(result.sourcesContent, [
         "foo.js",
         "lib/bar.js",
         "../vendor/dom.js",
@@ -681,7 +756,14 @@ function testResolve(method, sync) {
 
     method(code.fileRelative, codeUrl, readMap(map.mixed), function(error, result) {
       t.error(error)
-      t.deepEqual(result.sources, [
+      t.deepEqual(result.sourcesResolved, [
+        "http://example.com/a/b/c/foo.js",
+        "http://example.com/a/b/c/lib/bar.js",
+        "http://example.com/a/b/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "mixed")
+      t.deepEqual(result.sourcesContent, [
         "foo.js",
         "http://example.com/a/b/c/lib/bar.js",
         "http://example.com/a/b/vendor/dom.js",
@@ -693,7 +775,8 @@ function testResolve(method, sync) {
 
     method(code.fileRelative, codeUrl, wrap(read([map.simpleString])), function(error, result) {
       t.error(error)
-      t.deepEqual(result.sources, [map.simpleString], "read non-string")
+      t.deepEqual(result.sourcesResolved, ["http://example.com/a/b/c/foo.js"], "read non-string")
+      t.deepEqual(result.sourcesContent,  [map.simpleString],                  "read non-string")
       isAsync()
     })
 

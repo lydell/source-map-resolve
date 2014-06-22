@@ -130,7 +130,10 @@ void (function(root, factory) {
     sig("resolveSources", map, mapUrl, read, callback)
     var pending = map.sources.length
     var errored = false
-    var sources = []
+    var result = {
+      sourcesResolved: [],
+      sourcesContent:  []
+    }
 
     var done = function(error) {
       if (errored) {
@@ -142,17 +145,18 @@ void (function(root, factory) {
       }
       pending--
       if (pending === 0) {
-        callback(null, sources)
+        callback(null, result)
       }
     }
 
     resolveSourcesHelper(map, mapUrl, function(fullUrl, sourceContent, index) {
+      result.sourcesResolved[index] = fullUrl
       if (typeof sourceContent === "string") {
-        sources[index] = sourceContent
+        result.sourcesContent[index] = sourceContent
         callbackAsync(done, null)
       } else {
-        read(fullUrl, function(error, result) {
-          sources[index] = String(result)
+        read(fullUrl, function(error, source) {
+          result.sourcesContent[index] = String(source)
           done(error)
         })
       }
@@ -161,15 +165,19 @@ void (function(root, factory) {
 
   function resolveSourcesSync(map, mapUrl, read) {
     sig("resolveSourcesSync", map, mapUrl, read)
-    var sources = []
+    var result = {
+      sourcesResolved: [],
+      sourcesContent:  []
+    }
     resolveSourcesHelper(map, mapUrl, function(fullUrl, sourceContent, index) {
+      result.sourcesResolved[index] = fullUrl
       if (typeof sourceContent === "string") {
-        sources[index] = sourceContent
+        result.sourcesContent[index] = sourceContent
       } else {
-        sources[index] = String(read(fullUrl))
+        result.sourcesContent[index] = String(read(fullUrl))
       }
     })
-    return sources
+    return result
   }
 
   var endingSlash = /\/?$/
@@ -202,11 +210,12 @@ void (function(root, factory) {
       if (!mapData) {
         return callback(null, null)
       }
-      resolveSources(mapData.map, mapData.sourcesRelativeTo, read, function(error, sources) {
+      resolveSources(mapData.map, mapData.sourcesRelativeTo, read, function(error, result) {
         if (error) {
           return callback(error)
         }
-        mapData.sources = sources
+        mapData.sourcesResolved = result.sourcesResolved
+        mapData.sourcesContent  = result.sourcesContent
         callback(null, mapData)
       })
     })
@@ -218,7 +227,9 @@ void (function(root, factory) {
     if (!mapData) {
       return null
     }
-    mapData.sources = resolveSourcesSync(mapData.map, mapData.sourcesRelativeTo, read)
+    var result = resolveSourcesSync(mapData.map, mapData.sourcesRelativeTo, read)
+    mapData.sourcesResolved = result.sourcesResolved
+    mapData.sourcesContent  = result.sourcesContent
     return mapData
   }
 

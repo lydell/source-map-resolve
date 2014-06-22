@@ -31,7 +31,10 @@ sourceMapResolve.resolveSourceMap(code, "/js/foo.js", fs.readFile, function(erro
       return notifyFailure(error)
     }
     result
-    // ["<contents of /coffee/foo.coffee>"]
+    // {
+    //   sourcesResolved: ["/coffee/foo.coffee"],
+    //   sourcesContent: ["<contents of /coffee/foo.coffee>"]
+    // }
   })
 })
 
@@ -45,9 +48,10 @@ sourceMapResolve.resolve(code, "/js/foo.js", fs.readFile, function(error, result
   //   url: "/js/foo.js.map",
   //   sourcesRelativeTo: "/js/foo.js.map",
   //   sourceMappingURL: "foo.js.map",
-  //   sources: ["<contents of /coffee/foo.coffee>"]
+  //   sourcesResolved: ["/coffee/foo.coffee"],
+  //   sourcesContent: ["<contents of /coffee/foo.coffee>"]
   // }
-  result.map.sourcesContent = result.sources
+  result.map.sourcesContent = result.sourcesContent
   var map = new sourceMap.sourceMapConsumer(result.map)
   map.sourceContentFor("/coffee/foo.coffee")
   // "<contents of /coffee/foo.coffee>"
@@ -115,8 +119,12 @@ If `code` contains no sourceMappingURL, the result is `null`.
 - `callback(error, result)` is a function that is invoked with either an error
   or `null` and the result.
 
-The result is an array with the contents of all sources in `map.sources`, in
-the same order as `map.sources`.
+The result is an object with the following properties:
+
+- `sourcesResolved`: The same as `map.sources`, except all the sources are
+  fully resolved.
+- `sourcesContent`: An array with the contents of all sources in `map.sources`,
+  in the same order as `map.sources`.
 
 ### `sourceMapResolve.resolve(code, codeUrl, read, callback)` ###
 
@@ -126,9 +134,8 @@ This is simply a convienience method that first resolves the source map and
 then its sources. You could also do this by first calling
 `sourceMapResolve.resolveSourceMap` and then `sourceMapResolve.resolveSources`.
 
-The result is identical to `sourceMapResolve.resolveSourceMap`, except that the
-result object has one more property: `sources`, which is the result of
-`sourceMapResolve.resolveSources`.
+The result is identical to `sourceMapResolve.resolveSourceMap`, with the
+properties from `sourceMapResolve.resolveSources` merged into it.
 
 ### `sourceMapResolve.*Sync()` ###
 

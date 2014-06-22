@@ -1,3 +1,16 @@
+### Version 0.2.0 (Unreleased) ###
+
+- Changed: The result of `resolveSources` is now an object, not an array. The
+  old result array is available in the `sourcesContent` property.
+  (Backwards-incompatible change.)
+- Changed: `sources` has been renamed to `sourcesContent` in the result object
+  of `resolve`. (Backwards-incompatible change.)
+- Added: `resolveSources` now also returns all sources fully resolved, in the
+  `sourcesResolved` property.
+- Added: The result object of `resolve` now contains the `sourcesResolved`
+  property from `resolveSources`.
+
+
 ### Version 0.1.4 (2014-06-16) ###
 
 - Fixed: `sourcesContent` was mis-typed as `sourceContents`, which meant that

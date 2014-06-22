@@ -73,7 +73,7 @@ function testResolveSources(method, sync) {
 
     var mapUrl = "c:\\a\\b\\c\\foo.js.map"
 
-    t.plan(1 * 2)
+    t.plan(1 * 3)
 
     if (sync) {
       method = asyncify(method)
@@ -85,7 +85,8 @@ function testResolveSources(method, sync) {
 
     method(map, mapUrl, wrap(identity), function(error, result) {
       t.error(error)
-      t.deepEqual(result, ["/a/b/c/foo.js", "/foo.js", "/a/b/foo.js"])
+      t.deepEqual(result.sourcesResolved, ["/a/b/c/foo.js", "/foo.js", "/a/b/foo.js"])
+      t.deepEqual(result.sourcesContent,  ["/a/b/c/foo.js", "/foo.js", "/a/b/foo.js"])
     })
 
   }
@@ -128,7 +129,8 @@ function testResolve(method, sync) {
         url:               "/a/b/c/foo.js.map",
         sourcesRelativeTo: "/a/b/c/foo.js.map",
         map:               map,
-        sources:           ["/a/b/c/foo.js", "/foo.js", "/a/b/foo.js"]
+        sourcesResolved:   ["/a/b/c/foo.js", "/foo.js", "/a/b/foo.js"],
+        sourcesContent:    ["/a/b/c/foo.js", "/foo.js", "/a/b/foo.js"]
       })
     })
 
@@ -139,7 +141,8 @@ function testResolve(method, sync) {
         url:               "/foo.js.map",
         sourcesRelativeTo: "/foo.js.map",
         map:               map,
-        sources:           ["/foo.js", "/foo.js", "/foo.js"]
+        sourcesResolved:   ["/foo.js", "/foo.js", "/foo.js"],
+        sourcesContent:    ["/foo.js", "/foo.js", "/foo.js"]
       })
     })
 
@@ -150,7 +153,8 @@ function testResolve(method, sync) {
         url:               "/a/b/foo.js.map",
         sourcesRelativeTo: "/a/b/foo.js.map",
         map:               map,
-        sources:           ["/a/b/foo.js", "/foo.js", "/a/foo.js"]
+        sourcesResolved:   ["/a/b/foo.js", "/foo.js", "/a/foo.js"],
+        sourcesContent:    ["/a/b/foo.js", "/foo.js", "/a/foo.js"]
       })
     })
 
