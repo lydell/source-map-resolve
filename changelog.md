@@ -1,4 +1,4 @@
-### Version 0.2.0 (Unreleased) ###
+### Version 0.2.0 (2014-06-22) ###
 
 - Changed: The result of `resolveSources` is now an object, not an array. The
   old result array is available in the `sourcesContent` property.
