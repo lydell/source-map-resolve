@@ -95,7 +95,11 @@ void (function(root, factory) {
 
 
 
-  function resolveSources(map, mapUrl, read, callback) {
+  function resolveSources(map, mapUrl, read, options, callback) {
+    if (typeof options === "function") {
+      callback = options
+      options = {}
+    }
     var pending = map.sources.length
     var errored = false
     var result = {
@@ -117,7 +121,7 @@ void (function(root, factory) {
       }
     }
 
-    resolveSourcesHelper(map, mapUrl, function(fullUrl, sourceContent, index) {
+    resolveSourcesHelper(map, mapUrl, options, function(fullUrl, sourceContent, index) {
       result.sourcesResolved[index] = fullUrl
       if (typeof sourceContent === "string") {
         result.sourcesContent[index] = sourceContent
@@ -131,12 +135,12 @@ void (function(root, factory) {
     })
   }
 
-  function resolveSourcesSync(map, mapUrl, read) {
+  function resolveSourcesSync(map, mapUrl, read, options) {
     var result = {
       sourcesResolved: [],
       sourcesContent:  []
     }
-    resolveSourcesHelper(map, mapUrl, function(fullUrl, sourceContent, index) {
+    resolveSourcesHelper(map, mapUrl, options, function(fullUrl, sourceContent, index) {
       result.sourcesResolved[index] = fullUrl
       if (typeof sourceContent === "string") {
         result.sourcesContent[index] = sourceContent
@@ -149,11 +153,12 @@ void (function(root, factory) {
 
   var endingSlash = /\/?$/
 
-  function resolveSourcesHelper(map, mapUrl, fn) {
+  function resolveSourcesHelper(map, mapUrl, options, fn) {
+    options = options || {}
     var fullUrl
     var sourceContent
     for (var index = 0, len = map.sources.length; index < len; index++) {
-      if (map.sourceRoot) {
+      if (map.sourceRoot && !options.ignoreSourceRoot) {
         // Make sure that the sourceRoot ends with a slash, so that `/scripts/subdir` becomes
         // `/scripts/subdir/<source>`, not `/scripts/<source>`. Pointing to a file as source root
         // does not make sense.
@@ -168,7 +173,11 @@ void (function(root, factory) {
 
 
 
-  function resolve(code, codeUrl, read, callback) {
+  function resolve(code, codeUrl, read, options, callback) {
+    if (typeof options === "function") {
+      callback = options
+      options = {}
+    }
     resolveSourceMap(code, codeUrl, read, function(error, mapData) {
       if (error) {
         return callback(error)
@@ -176,7 +185,7 @@ void (function(root, factory) {
       if (!mapData) {
         return callback(null, null)
       }
-      resolveSources(mapData.map, mapData.sourcesRelativeTo, read, function(error, result) {
+      resolveSources(mapData.map, mapData.sourcesRelativeTo, read, options, function(error, result) {
         if (error) {
           return callback(error)
         }
@@ -187,12 +196,12 @@ void (function(root, factory) {
     })
   }
 
-  function resolveSync(code, codeUrl, read) {
+  function resolveSync(code, codeUrl, read, options) {
     var mapData = resolveSourceMapSync(code, codeUrl, read)
     if (!mapData) {
       return null
     }
-    var result = resolveSourcesSync(mapData.map, mapData.sourcesRelativeTo, read)
+    var result = resolveSourcesSync(mapData.map, mapData.sourcesRelativeTo, read, options)
     mapData.sourcesResolved = result.sourcesResolved
     mapData.sourcesContent  = result.sourcesContent
     return mapData

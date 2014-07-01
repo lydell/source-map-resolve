@@ -286,7 +286,7 @@ function testResolveSources(method, sync) {
 
     var mapUrl = "http://example.com/a/b/c/foo.js.map"
 
-    t.plan(1 + 6*3 + 4)
+    t.plan(1 + 7*3 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -296,6 +296,8 @@ function testResolveSources(method, sync) {
 
     var next = false
     function isAsync() { t.ok(next, "is async") }
+
+    var options
 
     method(map.simple, mapUrl, wrap(identity), function(error, result) {
       t.error(error)
@@ -324,6 +326,28 @@ function testResolveSources(method, sync) {
           "http://foo.org/baz.js"
         ]
       }, "sourceRoot")
+      isAsync()
+    })
+
+    options = {ignoreSourceRoot: true}
+    method(map.sourceRoot, mapUrl, wrap(identity), options, function(error, result) {
+      t.error(error)
+      t.deepEqual(result, {
+        sourcesResolved: [
+          "http://example.com/a/b/c/foo.js",
+          "http://example.com/a/b/c/lib/bar.js",
+          "http://example.com/a/b/vendor/dom.js",
+          "http://example.com/version.js",
+          "http://foo.org/baz.js"
+        ],
+        sourcesContent: [
+          "http://example.com/a/b/c/foo.js",
+          "http://example.com/a/b/c/lib/bar.js",
+          "http://example.com/a/b/vendor/dom.js",
+          "http://example.com/version.js",
+          "http://foo.org/baz.js"
+        ]
+      }, "ignore sourceRoot")
       isAsync()
     })
 
@@ -431,7 +455,7 @@ function testResolve(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + 18*3 + 6*4 + 4)
+    t.plan(1 + 18*3 + 7*4 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -643,6 +667,8 @@ function testResolve(method, sync) {
       return wrapMap(read(JSON.stringify(what)), identity)
     }
 
+    var options
+
     method(code.fileRelative, codeUrl, readMap(map.simple), function(error, result) {
       t.error(error)
       t.deepEqual(result.sourcesResolved, ["http://example.com/a/b/c/foo.js"], "simple")
@@ -666,6 +692,26 @@ function testResolve(method, sync) {
         "http://example.com/version.js",
         "http://foo.org/baz.js"
       ], "sourceRoot")
+      isAsync()
+    })
+
+    options = {ignoreSourceRoot: true}
+    method(code.fileRelative, codeUrl, readMap(map.sourceRoot), options, function(error, result) {
+      t.error(error)
+      t.deepEqual(result.sourcesResolved, [
+        "http://example.com/a/b/c/foo.js",
+        "http://example.com/a/b/c/lib/bar.js",
+        "http://example.com/a/b/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "sourceRoot")
+      t.deepEqual(result.sourcesContent, [
+        "http://example.com/a/b/c/foo.js",
+        "http://example.com/a/b/c/lib/bar.js",
+        "http://example.com/a/b/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "ignore sourceRoot")
       isAsync()
     })
 

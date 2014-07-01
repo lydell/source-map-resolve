@@ -108,7 +108,7 @@ The result is an object with the following properties:
 
 If `code` contains no sourceMappingURL, the result is `null`.
 
-### `sourceMapResolve.resolveSources(map, mapUrl, read, callback)` ###
+### `sourceMapResolve.resolveSources(map, mapUrl, read, [options], callback)` ###
 
 - `map` is a source map, as an object (not a string).
 - `mapUrl` is the url to the file containing `map`. Relative sources in the
@@ -116,6 +116,10 @@ If `code` contains no sourceMappingURL, the result is `null`.
 - `read(url, callback)` is a function that reads `url` and responds using
   `callback(error, content)`. In Node.js you might want to use `fs.readFile`,
   while in the browser you might want to use an asynchronus `XMLHttpRequest`.
+- `options` is an optional object with any of the following properties:
+  - `ignoreSourceRoot`: The `sourceRoot` property of source maps might only be
+    relevant when resolving sources in the browser. This lets you bypass it
+    when using the module outside of a browser, if needed. Defaults to `false`.
 - `callback(error, result)` is a function that is invoked with either an error
   or `null` and the result.
 
@@ -126,9 +130,11 @@ The result is an object with the following properties:
 - `sourcesContent`: An array with the contents of all sources in `map.sources`,
   in the same order as `map.sources`.
 
-### `sourceMapResolve.resolve(code, codeUrl, read, callback)` ###
+### `sourceMapResolve.resolve(code, codeUrl, read, [options], callback)` ###
 
-The arguments are identical to `sourceMapResolve.resolveSourceMap`.
+The arguments are identical to `sourceMapResolve.resolveSourceMap`, except that
+you may also provide the same `options` as in
+`sourceMapResolve.resolveSources`.
 
 This is simply a convienience method that first resolves the source map and
 then its sources. You could also do this by first calling
