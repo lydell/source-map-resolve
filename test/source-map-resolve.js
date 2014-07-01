@@ -80,13 +80,6 @@ var code = {
   noMap:              ""
 }
 
-function throwsError(t, method, args, num, desc) {
-  t["throws"](
-    function() { method.apply(null, args) },
-    RegExp("argument " + num + ".+" + desc + ".+\\n" + args[num-1])
-  )
-}
-
 
 function testResolveSourceMap(method, sync) {
   return function(t) {
@@ -94,22 +87,9 @@ function testResolveSourceMap(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + (sync ? 7 : 10) + 18*3)
+    t.plan(1 + 18*3)
 
     t.equal(typeof method, "function", "is a function")
-
-    throwsError(t, method, [                   ], 1, "code")
-    throwsError(t, method, [null               ], 1, "code")
-    throwsError(t, method, ["foo"              ], 2, "code url")
-    throwsError(t, method, ["foo", null        ], 2, "code url")
-    throwsError(t, method, ["foo", "bar"       ], 3, "read")
-    throwsError(t, method, ["foo", "bar", null ], 3, "read")
-    throwsError(t, method, ["foo", "bar", "baz"], 3, "read")
-    if (!sync) {
-      throwsError(t, method, ["foo", "bar", read()       ], 4, "callback")
-      throwsError(t, method, ["foo", "bar", read(), null ], 4, "callback")
-      throwsError(t, method, ["foo", "bar", read(), "baz"], 4, "callback")
-    }
 
     if (sync) {
       method = asyncify(method)
@@ -306,23 +286,9 @@ function testResolveSources(method, sync) {
 
     var mapUrl = "http://example.com/a/b/c/foo.js.map"
 
-    t.plan(1 + (sync ? 8 : 11) + 6*3 + 4)
+    t.plan(1 + 6*3 + 4)
 
     t.equal(typeof method, "function", "is a function")
-
-    throwsError(t, method, [                   ], 1, "source map")
-    throwsError(t, method, [null               ], 1, "source map")
-    throwsError(t, method, ["foo"              ], 1, "source map")
-    throwsError(t, method, [{}                 ], 2, "map url")
-    throwsError(t, method, [{}, null           ], 2, "map url")
-    throwsError(t, method, [{}, "bar"          ], 3, "read")
-    throwsError(t, method, [{}, "bar", null    ], 3, "read")
-    throwsError(t, method, [{}, "bar", "baz"   ], 3, "read")
-    if (!sync) {
-      throwsError(t, method, [{}, "bar", read()       ], 4, "callback")
-      throwsError(t, method, [{}, "bar", read(), null ], 4, "callback")
-      throwsError(t, method, [{}, "bar", read(), "baz"], 4, "callback")
-    }
 
     if (sync) {
       method = asyncify(method)
@@ -465,22 +431,9 @@ function testResolve(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + (sync ? 7 : 10) + 18*3 + 6*4 + 4)
+    t.plan(1 + 18*3 + 6*4 + 4)
 
     t.equal(typeof method, "function", "is a function")
-
-    throwsError(t, method, [                   ], 1, "code")
-    throwsError(t, method, [null               ], 1, "code")
-    throwsError(t, method, ["foo"              ], 2, "code url")
-    throwsError(t, method, ["foo", null        ], 2, "code url")
-    throwsError(t, method, ["foo", "bar"       ], 3, "read")
-    throwsError(t, method, ["foo", "bar", null ], 3, "read")
-    throwsError(t, method, ["foo", "bar", "baz"], 3, "read")
-    if (!sync) {
-      throwsError(t, method, ["foo", "bar", read(map.simpleString)       ], 4, "callback")
-      throwsError(t, method, ["foo", "bar", read(map.simpleString), null ], 4, "callback")
-      throwsError(t, method, ["foo", "bar", read(map.simpleString), "baz"], 4, "callback")
-    }
 
     if (sync) {
       method = asyncify(method)

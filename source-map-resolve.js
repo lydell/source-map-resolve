@@ -21,35 +21,6 @@ void (function(root, factory) {
     setImmediate(function() { callback(error, result) })
   }
 
-  function sig(name, codeOrMap, url, read, callback) {
-    var type = (name.indexOf("Sources") >= 0 ? "map" : "code")
-
-    var throwError = function(num, what, got) {
-      throw new Error(
-        name + " requires argument " + num + " to be " + what + ". Got:\n" + got
-      )
-    }
-
-    if (type === "map") {
-      if (typeof codeOrMap !== "object" || codeOrMap === null) {
-        throwError(1, "a source map", codeOrMap)
-      }
-    } else {
-      if (typeof codeOrMap !== "string") {
-        throwError(1, "some code", codeOrMap)
-      }
-    }
-    if (typeof url !== "string") {
-      throwError(2, "the " + type + " url", url)
-    }
-    if (typeof read !== "function") {
-      throwError(3, "a reading function", read)
-    }
-    if (arguments.length === 1 + 4 && typeof callback !== "function") {
-      throwError(4, "a callback function", callback)
-    }
-  }
-
   function parseMapToJSON(string) {
     return JSON.parse(string.replace(/^\)\]\}'/, ""))
   }
@@ -57,7 +28,6 @@ void (function(root, factory) {
 
 
   function resolveSourceMap(code, codeUrl, read, callback) {
-    sig("resolveSourceMap", code, codeUrl, read, callback)
     var mapData
     try {
       mapData = resolveSourceMapHelper(code, codeUrl)
@@ -81,7 +51,6 @@ void (function(root, factory) {
   }
 
   function resolveSourceMapSync(code, codeUrl, read) {
-    sig("resolveSourceMapSync", code, codeUrl, read)
     var mapData = resolveSourceMapHelper(code, codeUrl)
     if (!mapData || mapData.map) {
       return mapData
@@ -127,7 +96,6 @@ void (function(root, factory) {
 
 
   function resolveSources(map, mapUrl, read, callback) {
-    sig("resolveSources", map, mapUrl, read, callback)
     var pending = map.sources.length
     var errored = false
     var result = {
@@ -164,7 +132,6 @@ void (function(root, factory) {
   }
 
   function resolveSourcesSync(map, mapUrl, read) {
-    sig("resolveSourcesSync", map, mapUrl, read)
     var result = {
       sourcesResolved: [],
       sourcesContent:  []
@@ -202,7 +169,6 @@ void (function(root, factory) {
 
 
   function resolve(code, codeUrl, read, callback) {
-    sig("resolve", code, codeUrl, read, callback)
     resolveSourceMap(code, codeUrl, read, function(error, mapData) {
       if (error) {
         return callback(error)
@@ -222,7 +188,6 @@ void (function(root, factory) {
   }
 
   function resolveSync(code, codeUrl, read) {
-    sig("resolveSync", code, codeUrl, read)
     var mapData = resolveSourceMapSync(code, codeUrl, read)
     if (!mapData) {
       return null
