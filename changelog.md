@@ -1,3 +1,13 @@
+### Version 0.3.0 (2014-07-02) ###
+
+- Removed: Argument checking. It’s not worth it. (Possibly
+  backwards-incompatible change.)
+- Added: The `sourceRoot` property of source maps may now be ignored, which can
+  be useful when resolving sources outside of the browser.
+- Added: It is now possible to resolve only the URLs of sources, without
+  reading them.
+
+
 ### Version 0.2.0 (2014-06-22) ###
 
 - Changed: The result of `resolveSources` is now an object, not an array. The
