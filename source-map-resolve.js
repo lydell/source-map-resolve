@@ -142,10 +142,12 @@ void (function(root, factory) {
     }
     resolveSourcesHelper(map, mapUrl, options, function(fullUrl, sourceContent, index) {
       result.sourcesResolved[index] = fullUrl
-      if (typeof sourceContent === "string") {
-        result.sourcesContent[index] = sourceContent
-      } else {
-        result.sourcesContent[index] = String(read(fullUrl))
+      if (read !== null) {
+        if (typeof sourceContent === "string") {
+          result.sourcesContent[index] = sourceContent
+        } else {
+          result.sourcesContent[index] = String(read(fullUrl))
+        }
       }
     })
     return result

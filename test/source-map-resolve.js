@@ -440,6 +440,24 @@ test(".resolveSources",     testResolveSources(sourceMapResolve.resolveSources, 
 
 test(".resolveSourcesSync", testResolveSources(sourceMapResolve.resolveSourcesSync, true))
 
+test(".resolveSourcesSync no read", function(t) {
+  t.plan(1)
+
+  var mapUrl = "http://example.com/a/b/c/foo.js.map"
+  var result = sourceMapResolve.resolveSourcesSync(map.mixed, mapUrl, null)
+
+  t.deepEqual(result, {
+    sourcesResolved: [
+      "http://example.com/a/b/c/foo.js",
+      "http://example.com/a/b/c/lib/bar.js",
+      "http://example.com/a/b/vendor/dom.js",
+      "http://example.com/version.js",
+      "http://foo.org/baz.js"
+    ],
+    sourcesContent: []
+  })
+})
+
 
 function testResolve(method, sync) {
   return function(t) {

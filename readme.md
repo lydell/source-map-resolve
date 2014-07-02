@@ -153,6 +153,13 @@ to the async versions, except:
   `XMLHttpRequest`.
 - They throw errors and return the result instead of using a callback.
 
+`sourceMapResolve.resolveSourcesSync` also accepts `null` as the `read`
+parameter. The result is the same as when passing a function as the `read
+parameter`, except that the `sourcesContent` property of the result will be an
+empty array. In other words, the sources aren’t read. You only get the
+`sourcesResolved` property. (This only supported in the synchronus version, since
+there is no point doing it asynchronusly.)
+
 
 Note
 ====
