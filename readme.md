@@ -199,7 +199,7 @@ Generating the browser version
 
 source-map-resolve.js is generated from source-map-resolve-node.js and
 source-map-resolve-template.js. Only edit the two latter files, _not_
-source-map-resolve.js! To generate it, run `node generate-source-map-resolve.js`
+source-map-resolve.js! To generate it, run `npm run build`.
 
 
 License

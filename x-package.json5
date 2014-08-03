@@ -23,7 +23,10 @@
       main: "lib/source-map-resolve-node.js",
       browser: "source-map-resolve.js",
       scripts: {
-        test: "jshint lib/ test/ && node test/source-map-resolve.js && node test/windows.js"
+        lint: "jshint lib/ test/",
+        unit: "node test/source-map-resolve.js && node test/windows.js",
+        test: "npm run lint && npm run unit",
+        build: "node generate-source-map-resolve.js"
       },
       dependencies: {
         "source-map-url": "~0.2.0",
