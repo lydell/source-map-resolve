@@ -1,4 +1,4 @@
-### Version 0.3.1 (Unreleased) ###
+### Version 0.3.1 (2014-08-16) ###
 
 - Improved: Updated the source-map-url dependency to 0.3.0.
 
