@@ -63,7 +63,7 @@ void (function(root, factory) {
   var jsonMimeTypeRegex = /^(?:application|text)\/json$/
 
   function resolveSourceMapHelper(code, codeUrl) {
-    var url = sourceMappingURL.get(code)
+    var url = sourceMappingURL.getFrom(code)
     if (!url) {
       return null
     }

@@ -1,3 +1,8 @@
+### Version 0.3.1 (Unreleased) ###
+
+- Improved: Updated the source-map-url dependency to 0.3.0.
+
+
 ### Version 0.3.0 (2014-07-02) ###
 
 - Removed: Argument checking. It’s not worth it. (Possibly

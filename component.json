@@ -23,7 +23,7 @@
     "source-map-resolve.js"
   ],
   "dependencies": {
-    "lydell/source-map-url": "~0.2.0",
+    "lydell/source-map-url": "~0.3.0",
     "lydell/resolve-url": "~0.2.1"
   }
 }
