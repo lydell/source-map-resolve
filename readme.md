@@ -1,4 +1,4 @@
-Overview [![Build Status](https://travis-ci.org/lydell/source-map-resolve.png?branch=master)](https://travis-ci.org/lydell/source-map-resolve)
+Overview [![Build Status](https://travis-ci.org/lydell/source-map-resolve.svg?branch=master)](https://travis-ci.org/lydell/source-map-resolve)
 ========
 
 [![browser support](https://ci.testling.com/lydell/source-map-resolve.png)](https://ci.testling.com/lydell/source-map-resolve)
