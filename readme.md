@@ -162,6 +162,12 @@ empty array. In other words, the sources aren’t read. You only get the
 `sourcesResolved` property. (This only supported in the synchronus version, since
 there is no point doing it asynchronusly.)
 
+### `sourceMapResolve.parseMapToJSON(string)` ###
+
+The spec says that if a source map (as a string) starts with `)]}'`, it should
+be stripped off. This is to prevent XSSI attacks. This function does that and
+returns the result of `JSON.parse`ing what’s left.
+
 
 Note
 ====

@@ -905,3 +905,8 @@ function testResolve(method, sync) {
 test(".resolve",     testResolve(sourceMapResolve.resolve,    false))
 
 test(".resolveSync", testResolve(sourceMapResolve.resolveSync, true))
+
+test(".parseMapToJSON", function(t) {
+  t.plan(1)
+  t.deepEqual(sourceMapResolve.parseMapToJSON(map.XSSIsafe), map.simple)
+})
