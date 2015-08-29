@@ -137,12 +137,21 @@ The result is an object with the following properties:
 The arguments are identical to `sourceMapResolve.resolveSourceMap`, except that
 you may also provide the same `options` as in `sourceMapResolve.resolveSources`.
 
-This is simply a convienience method that first resolves the source map and
-then its sources. You could also do this by first calling
+This is a convenience method that first resolves the source map and then its
+sources. You could also do this by first calling
 `sourceMapResolve.resolveSourceMap` and then `sourceMapResolve.resolveSources`.
 
 The result is identical to `sourceMapResolve.resolveSourceMap`, with the
 properties from `sourceMapResolve.resolveSources` merged into it.
+
+There is one extra feature available, though. If `code` is `null`, `codeUrl` is
+treated as a url to the source map instead of to `code`, and will be read. This
+is handy if you _sometimes_ get the source map url from the `SourceMap: <url>`
+header (see the [Notes] section). In this case, the `sourceMappingURL` property
+of the result is `null`.
+
+
+[Notes]: #notes
 
 ### `sourceMapResolve.*Sync()` ###
 

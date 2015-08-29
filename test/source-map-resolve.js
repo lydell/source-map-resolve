@@ -522,7 +522,7 @@ function testResolve(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + 18*3 + 9*4 + 4)
+    t.plan(1 + 23*3 + 11*4 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -895,6 +895,100 @@ function testResolve(method, sync) {
       calledBack = true
       t.equal(error.message, "http://example.com/a/b/c/lib/bar.js", "read throws")
       t.notOk(result)
+      isAsync()
+    })
+
+    var mapUrl = "https://foo.org/foo.js.map"
+
+    method(null, mapUrl, readSimple, function(error, result) {
+      t.error(error)
+      t.deepEqual(result, {
+        sourceMappingURL:  null,
+        url:               "https://foo.org/foo.js.map",
+        sourcesRelativeTo: "https://foo.org/foo.js.map",
+        map:               map.simple,
+        sourcesResolved:   ["https://foo.org/foo.js"],
+        sourcesContent:    ["https://foo.org/foo.js"]
+      }, "mapUrl simple")
+      isAsync()
+    })
+
+    method(null, mapUrl, wrap(read([map.simpleString])), function(error, result) {
+      t.error(error)
+      t.deepEqual(result, {
+        sourceMappingURL:  null,
+        url:               "https://foo.org/foo.js.map",
+        sourcesRelativeTo: "https://foo.org/foo.js.map",
+        map:               map.simple,
+        sourcesResolved:   ["https://foo.org/foo.js"],
+        sourcesContent:    [map.simpleString]
+      }, "mapUrl read non-string")
+      isAsync()
+    })
+
+    method(null, mapUrl, wrap(read("invalid JSON")), function(error, result) {
+      t.ok(error instanceof SyntaxError, "mapUrl read invalid JSON")
+      t.notOk(result)
+      isAsync()
+    })
+
+    method(null, mapUrl, wrapMap(read(map.XSSIsafe), identity), function(error, result) {
+      t.error(error)
+      t.deepEqual(result, {
+        sourceMappingURL:  null,
+        url:               "https://foo.org/foo.js.map",
+        sourcesRelativeTo: "https://foo.org/foo.js.map",
+        map:               map.simple,
+        sourcesResolved:   ["https://foo.org/foo.js"],
+        sourcesContent:    ["https://foo.org/foo.js"]
+      }, "mapUrl XSSIsafe map")
+      isAsync()
+    })
+
+    method(null, mapUrl, wrap(Throws), function(error, result) {
+      t.equal(error.message, "https://foo.org/foo.js.map", "mapUrl read throws")
+      t.notOk(result)
+      isAsync()
+    })
+
+    mapUrl = "http://example.com/a/b/c/foo.js.map"
+
+    options = {sourceRoot: "/static/js/"}
+    method(null, mapUrl, readMap(map.sourceRoot), options, function(error, result) {
+      t.error(error)
+      t.deepEqual(result.sourcesResolved, [
+        "http://example.com/static/js/foo.js",
+        "http://example.com/static/js/lib/bar.js",
+        "http://example.com/static/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "mapUrl custom sourceRoot")
+      t.deepEqual(result.sourcesContent, [
+        "http://example.com/static/js/foo.js",
+        "http://example.com/static/js/lib/bar.js",
+        "http://example.com/static/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "mapUrl custom sourceRoot")
+      isAsync()
+    })
+
+    method(null, mapUrl, readMap(map.mixed), function(error, result) {
+      t.error(error)
+      t.deepEqual(result.sourcesResolved, [
+        "http://example.com/a/b/c/foo.js",
+        "http://example.com/a/b/c/lib/bar.js",
+        "http://example.com/a/b/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "mapUrl mixed")
+      t.deepEqual(result.sourcesContent, [
+        "foo.js",
+        "http://example.com/a/b/c/lib/bar.js",
+        "http://example.com/a/b/vendor/dom.js",
+        "/version.js",
+        "//foo.org/baz.js"
+      ], "mapUrl mixed")
       isAsync()
     })
 

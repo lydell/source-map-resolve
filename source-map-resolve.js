@@ -167,7 +167,9 @@ void (function(root, factory) {
       } else if (typeof map.sourceRoot === "string" && options.sourceRoot !== false) {
         sourceRoot = map.sourceRoot
       }
-      if (sourceRoot === null) {
+      // If the sourceRoot is the empty string, it is equivalent to not setting
+      // the property at all.
+      if (sourceRoot === null || sourceRoot === '') {
         fullUrl = resolveUrl(mapUrl, map.sources[index])
       } else {
         // Make sure that the sourceRoot ends with a slash, so that `/scripts/subdir` becomes
@@ -187,13 +189,38 @@ void (function(root, factory) {
       callback = options
       options = {}
     }
-    resolveSourceMap(code, codeUrl, read, function(error, mapData) {
-      if (error) {
-        return callback(error)
-      }
-      if (!mapData) {
-        return callback(null, null)
-      }
+    if (code === null) {
+      var mapUrl = codeUrl
+      read(mapUrl, function(error, result) {
+        if (error) {
+          return callback(error)
+        }
+        var map
+        try {
+          map = parseMapToJSON(String(result))
+        } catch (error) {
+          return callback(error)
+        }
+        _resolveSources({
+          sourceMappingURL: null,
+          url: mapUrl,
+          sourcesRelativeTo: mapUrl,
+          map: map
+        })
+      })
+    } else {
+      resolveSourceMap(code, codeUrl, read, function(error, mapData) {
+        if (error) {
+          return callback(error)
+        }
+        if (!mapData) {
+          return callback(null, null)
+        }
+        _resolveSources(mapData)
+      })
+    }
+
+    function _resolveSources(mapData) {
       resolveSources(mapData.map, mapData.sourcesRelativeTo, read, options, function(error, result) {
         if (error) {
           return callback(error)
@@ -202,13 +229,24 @@ void (function(root, factory) {
         mapData.sourcesContent  = result.sourcesContent
         callback(null, mapData)
       })
-    })
+    }
   }
 
   function resolveSync(code, codeUrl, read, options) {
-    var mapData = resolveSourceMapSync(code, codeUrl, read)
-    if (!mapData) {
-      return null
+    var mapData
+    if (code === null) {
+      var mapUrl = codeUrl
+      mapData = {
+        sourceMappingURL: null,
+        url: mapUrl,
+        sourcesRelativeTo: mapUrl,
+        map: parseMapToJSON(String(read(mapUrl)))
+      }
+    } else {
+      mapData = resolveSourceMapSync(code, codeUrl, read)
+      if (!mapData) {
+        return null
+      }
     }
     var result = resolveSourcesSync(mapData.map, mapData.sourcesRelativeTo, read, options)
     mapData.sourcesResolved = result.sourcesResolved
@@ -224,7 +262,8 @@ void (function(root, factory) {
     resolveSources:       resolveSources,
     resolveSourcesSync:   resolveSourcesSync,
     resolve:              resolve,
-    resolveSync:          resolveSync
+    resolveSync:          resolveSync,
+    parseMapToJSON:       parseMapToJSON
   }
 
 }));
