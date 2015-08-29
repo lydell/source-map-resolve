@@ -1,3 +1,14 @@
+### Version 0.4.0 (2015-08-29) ###
+
+- Removed: The `ignoreSourceRoot` option of `resolveSources`. It has been
+  replaced with `sourceRoot: false`. (Backwards-incompatible change.)
+- Added: The `sourceRoot` option of `resolveSources`. It not only allows to
+  ignore the source root, it also lets you replace it.
+- Added: The `parseMapToJSON` method.
+- Added: The `resolve` method now accepts `null, mapUrl, ...` as arguments, in
+  addition to the existing signature, which will read `mapUrl` instead of
+  looking for a sourceMappingURL in the code.
+
 ### Version 0.3.1 (2014-08-16) ###
 
 - Improved: Updated the source-map-url dependency to 0.3.0.
