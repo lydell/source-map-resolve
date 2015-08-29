@@ -135,8 +135,7 @@ The result is an object with the following properties:
 ### `sourceMapResolve.resolve(code, codeUrl, read, [options], callback)` ###
 
 The arguments are identical to `sourceMapResolve.resolveSourceMap`, except that
-you may also provide the same `options` as in
-`sourceMapResolve.resolveSources`.
+you may also provide the same `options` as in `sourceMapResolve.resolveSources`.
 
 This is simply a convienience method that first resolves the source map and
 then its sources. You could also do this by first calling
