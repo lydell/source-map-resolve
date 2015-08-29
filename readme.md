@@ -117,9 +117,11 @@ If `code` contains no sourceMappingURL, the result is `null`.
   `callback(error, content)`. In Node.js you might want to use `fs.readFile`,
   while in the browser you might want to use an asynchronus `XMLHttpRequest`.
 - `options` is an optional object with any of the following properties:
-  - `ignoreSourceRoot`: The `sourceRoot` property of source maps might only be
-    relevant when resolving sources in the browser. This lets you bypass it
-    when using the module outside of a browser, if needed. Defaults to `false`.
+  - `sourceRoot`: Override the `sourceRoot` property of the source map, which
+    might only be relevant when resolving sources in the browser. This lets you
+    bypass it when using the module outside of a browser, if needed. Pass a
+    string to replace the `sourceRoot` property with, or `false` to ignore it.
+    Defaults to `undefined`.
 - `callback(error, result)` is a function that is invoked with either an error
   or `null` and the result.
 

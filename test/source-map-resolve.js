@@ -286,7 +286,7 @@ function testResolveSources(method, sync) {
 
     var mapUrl = "http://example.com/a/b/c/foo.js.map"
 
-    t.plan(1 + 7*3 + 4)
+    t.plan(1 + 8*3 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -329,7 +329,7 @@ function testResolveSources(method, sync) {
       isAsync()
     })
 
-    options = {ignoreSourceRoot: true}
+    options = {sourceRoot: false}
     method(map.sourceRoot, mapUrl, wrap(identity), options, function(error, result) {
       t.error(error)
       t.deepEqual(result, {
@@ -348,6 +348,28 @@ function testResolveSources(method, sync) {
           "http://foo.org/baz.js"
         ]
       }, "ignore sourceRoot")
+      isAsync()
+    })
+
+    options = {sourceRoot: "/static/js/"}
+    method(map.sourceRoot, mapUrl, wrap(identity), options, function(error, result) {
+      t.error(error)
+      t.deepEqual(result, {
+        sourcesResolved: [
+          "http://example.com/static/js/foo.js",
+          "http://example.com/static/js/lib/bar.js",
+          "http://example.com/static/vendor/dom.js",
+          "http://example.com/version.js",
+          "http://foo.org/baz.js"
+        ],
+        sourcesContent: [
+          "http://example.com/static/js/foo.js",
+          "http://example.com/static/js/lib/bar.js",
+          "http://example.com/static/vendor/dom.js",
+          "http://example.com/version.js",
+          "http://foo.org/baz.js"
+        ]
+      }, "custom sourceRoot")
       isAsync()
     })
 
@@ -473,7 +495,7 @@ function testResolve(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + 18*3 + 7*4 + 4)
+    t.plan(1 + 18*3 + 8*4 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -713,7 +735,7 @@ function testResolve(method, sync) {
       isAsync()
     })
 
-    options = {ignoreSourceRoot: true}
+    options = {sourceRoot: false}
     method(code.fileRelative, codeUrl, readMap(map.sourceRoot), options, function(error, result) {
       t.error(error)
       t.deepEqual(result.sourcesResolved, [
@@ -722,7 +744,7 @@ function testResolve(method, sync) {
         "http://example.com/a/b/vendor/dom.js",
         "http://example.com/version.js",
         "http://foo.org/baz.js"
-      ], "sourceRoot")
+      ], "ignore sourceRoot")
       t.deepEqual(result.sourcesContent, [
         "http://example.com/a/b/c/foo.js",
         "http://example.com/a/b/c/lib/bar.js",
@@ -730,6 +752,26 @@ function testResolve(method, sync) {
         "http://example.com/version.js",
         "http://foo.org/baz.js"
       ], "ignore sourceRoot")
+      isAsync()
+    })
+
+    options = {sourceRoot: "/static/js/"}
+    method(code.fileRelative, codeUrl, readMap(map.sourceRoot), options, function(error, result) {
+      t.error(error)
+      t.deepEqual(result.sourcesResolved, [
+        "http://example.com/static/js/foo.js",
+        "http://example.com/static/js/lib/bar.js",
+        "http://example.com/static/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "custom sourceRoot")
+      t.deepEqual(result.sourcesContent, [
+        "http://example.com/static/js/foo.js",
+        "http://example.com/static/js/lib/bar.js",
+        "http://example.com/static/vendor/dom.js",
+        "http://example.com/version.js",
+        "http://foo.org/baz.js"
+      ], "custom sourceRoot")
       isAsync()
     })
 

@@ -159,14 +159,21 @@ void (function(root, factory) {
     options = options || {}
     var fullUrl
     var sourceContent
+    var sourceRoot
     for (var index = 0, len = map.sources.length; index < len; index++) {
-      if (map.sourceRoot && !options.ignoreSourceRoot) {
+      sourceRoot = null
+      if (typeof options.sourceRoot === "string") {
+        sourceRoot = options.sourceRoot
+      } else if (typeof map.sourceRoot === "string" && options.sourceRoot !== false) {
+        sourceRoot = map.sourceRoot
+      }
+      if (sourceRoot === null) {
+        fullUrl = resolveUrl(mapUrl, map.sources[index])
+      } else {
         // Make sure that the sourceRoot ends with a slash, so that `/scripts/subdir` becomes
         // `/scripts/subdir/<source>`, not `/scripts/<source>`. Pointing to a file as source root
         // does not make sense.
-        fullUrl = resolveUrl(mapUrl, map.sourceRoot.replace(endingSlash, "/"), map.sources[index])
-      } else {
-        fullUrl = resolveUrl(mapUrl, map.sources[index])
+        fullUrl = resolveUrl(mapUrl, sourceRoot.replace(endingSlash, "/"), map.sources[index])
       }
       sourceContent = (map.sourcesContent || [])[index]
       fn(fullUrl, sourceContent, index)
