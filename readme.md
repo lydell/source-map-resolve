@@ -130,7 +130,8 @@ The result is an object with the following properties:
 - `sourcesResolved`: The same as `map.sources`, except all the sources are
   fully resolved.
 - `sourcesContent`: An array with the contents of all sources in `map.sources`,
-  in the same order as `map.sources`.
+  in the same order as `map.sources`. If getting the contents of a source fails,
+  an error object is put into the array instead.
 
 ### `sourceMapResolve.resolve(code, codeUrl, read, [options], callback)` ###
 
@@ -170,11 +171,22 @@ empty array. In other words, the sources aren’t read. You only get the
 `sourcesResolved` property. (This only supported in the synchronus version, since
 there is no point doing it asynchronusly.)
 
-### `sourceMapResolve.parseMapToJSON(string)` ###
+### `sourceMapResolve.parseMapToJSON(string, [data])` ###
 
 The spec says that if a source map (as a string) starts with `)]}'`, it should
 be stripped off. This is to prevent XSSI attacks. This function does that and
 returns the result of `JSON.parse`ing what’s left.
+
+If this function throws `error`, `error.sourceMapData === data`.
+
+### Errors
+
+All errors passed to callbacks or thrown by this module have a `sourceMapData`
+property that contain as much as possible of the intended result of the function
+up until the error occurred.
+
+Note that while the `map` property of result objects always is an object,
+`error.sourceMapData.map` will be a string if parsing that string fails.
 
 
 Note

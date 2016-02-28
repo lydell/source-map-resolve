@@ -21,8 +21,22 @@ void (function(root, factory) {
     setImmediate(function() { callback(error, result) })
   }
 
-  function parseMapToJSON(string) {
-    return JSON.parse(string.replace(/^\)\]\}'/, ""))
+  function parseMapToJSON(string, data) {
+    try {
+      return JSON.parse(string.replace(/^\)\]\}'/, ""))
+    } catch (error) {
+      error.sourceMapData = data
+      throw error
+    }
+  }
+
+  function readSync(read, url, data) {
+    try {
+      return String(read(url))
+    } catch (error) {
+      error.sourceMapData = data
+      throw error
+    }
   }
 
 
@@ -39,10 +53,12 @@ void (function(root, factory) {
     }
     read(mapData.url, function(error, result) {
       if (error) {
+        error.sourceMapData = mapData
         return callback(error)
       }
+      mapData.map = String(result)
       try {
-        mapData.map = parseMapToJSON(String(result))
+        mapData.map = parseMapToJSON(mapData.map, mapData)
       } catch (error) {
         return callback(error)
       }
@@ -55,7 +71,8 @@ void (function(root, factory) {
     if (!mapData || mapData.map) {
       return mapData
     }
-    mapData.map = parseMapToJSON(String(read(mapData.url)))
+    mapData.map = readSync(read, mapData.url, mapData)
+    mapData.map = parseMapToJSON(mapData.map, mapData)
     return mapData
   }
 
@@ -71,17 +88,24 @@ void (function(root, factory) {
     var dataUri = url.match(dataUriRegex)
     if (dataUri) {
       var mimeType = dataUri[1]
-      var lastParameter = dataUri[2]
-      var encoded = dataUri[3]
-      if (!jsonMimeTypeRegex.test(mimeType)) {
-        throw new Error("Unuseful data uri mime type: " + (mimeType || "text/plain"))
-      }
-      return {
+      var lastParameter = dataUri[2] || ""
+      var encoded = dataUri[3] || ""
+      var data = {
         sourceMappingURL: url,
         url: null,
         sourcesRelativeTo: codeUrl,
-        map: parseMapToJSON(lastParameter === ";base64" ? atob(encoded) : decodeURIComponent(encoded))
+        map: encoded
       }
+      if (!jsonMimeTypeRegex.test(mimeType)) {
+        var error = new Error("Unuseful data uri mime type: " + (mimeType || "text/plain"))
+        error.sourceMapData = data
+        throw error
+      }
+      data.map = parseMapToJSON(
+        lastParameter === ";base64" ? atob(encoded) : decodeURIComponent(encoded),
+        data
+      )
+      return data
     }
 
     var mapUrl = resolveUrl(codeUrl, url)
@@ -101,20 +125,12 @@ void (function(root, factory) {
       options = {}
     }
     var pending = map.sources.length
-    var errored = false
     var result = {
       sourcesResolved: [],
       sourcesContent:  []
     }
 
-    var done = function(error) {
-      if (errored) {
-        return
-      }
-      if (error) {
-        errored = true
-        return callback(error)
-      }
+    var done = function() {
       pending--
       if (pending === 0) {
         callback(null, result)
@@ -128,8 +144,8 @@ void (function(root, factory) {
         callbackAsync(done, null)
       } else {
         read(fullUrl, function(error, source) {
-          result.sourcesContent[index] = String(source)
-          done(error)
+          result.sourcesContent[index] = error ? error : String(source)
+          done()
         })
       }
     })
@@ -146,7 +162,11 @@ void (function(root, factory) {
         if (typeof sourceContent === "string") {
           result.sourcesContent[index] = sourceContent
         } else {
-          result.sourcesContent[index] = String(read(fullUrl))
+          try {
+            result.sourcesContent[index] = String(read(fullUrl))
+          } catch (error) {
+            result.sourcesContent[index] = error
+          }
         }
       }
     })
@@ -191,22 +211,24 @@ void (function(root, factory) {
     }
     if (code === null) {
       var mapUrl = codeUrl
+      var data = {
+        sourceMappingURL: null,
+        url: mapUrl,
+        sourcesRelativeTo: mapUrl,
+        map: null
+      }
       read(mapUrl, function(error, result) {
         if (error) {
+          error.sourceMapData = data
           return callback(error)
         }
-        var map
+        data.map = String(result)
         try {
-          map = parseMapToJSON(String(result))
+          data.map = parseMapToJSON(data.map, data)
         } catch (error) {
           return callback(error)
         }
-        _resolveSources({
-          sourceMappingURL: null,
-          url: mapUrl,
-          sourcesRelativeTo: mapUrl,
-          map: map
-        })
+        _resolveSources(data)
       })
     } else {
       resolveSourceMap(code, codeUrl, read, function(error, mapData) {
@@ -240,8 +262,10 @@ void (function(root, factory) {
         sourceMappingURL: null,
         url: mapUrl,
         sourcesRelativeTo: mapUrl,
-        map: parseMapToJSON(String(read(mapUrl)))
+        map: null
       }
+      mapData.map = readSync(read, mapUrl, mapData)
+      mapData.map = parseMapToJSON(mapData.map, mapData)
     } else {
       mapData = resolveSourceMapSync(code, codeUrl, read)
       if (!mapData) {
