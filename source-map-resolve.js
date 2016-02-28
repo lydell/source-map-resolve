@@ -1,4 +1,4 @@
-// Copyright 2014, 2015 Simon Lydell
+// Copyright 2014, 2015, 2016 Simon Lydell
 // X11 (“MIT”) Licensed. (See LICENSE.)
 
 // Note: source-map-resolve.js is generated from source-map-resolve-node.js and
