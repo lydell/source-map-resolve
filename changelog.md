@@ -1,3 +1,13 @@
+### Version 0.5.0 (2016-02-28) ###
+
+- Improved: Errors now have a `sourceMapData` property that contain as much as
+  possible of the intended result of the function up until the error occurred.
+- Changed: `resolveSources` and `resolve`, as well as their `*Sync`
+  alternatives, no longer fail when one single source fails to be fetched.
+  Instead, the `sourcesContent` array in the result object will contain error
+  objects for all failed sources, and strings otherwise. (Backwards-incompatible
+  change.)
+
 ### Version 0.4.0 (2015-08-29) ###
 
 - Removed: The `ignoreSourceRoot` option of `resolveSources`. It has been
