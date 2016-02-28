@@ -38,9 +38,9 @@
         "resolve-url": "^0.2.1"
       },
       devDependencies: {
-        "tape": "^4.2.0",
-        "jshint": "~2.4.3",
-        "setimmediate": "^1.0.2",
+        "tape": "^4.4.0",
+        "jshint": "~2.9.1",
+        "setimmediate": "^1.0.4",
         "Base64": "^0.3.0",
         "simple-asyncify": "^1.0.0"
       },
