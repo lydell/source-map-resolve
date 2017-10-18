@@ -55,7 +55,13 @@ var map = {
     sources:        ["foo.js", "lib/bar.js", "../vendor/dom.js", "/version.js", "//foo.org/baz.js"],
     sourcesContent: ["foo.js", null        , null              , "/version.js", "//foo.org/baz.js"],
     names:          []
-  }
+  },
+  noSources: {
+    mappings: "",
+    sources:  [],
+    names:    []
+  },
+  empty: {}
 }
 map.simpleString = JSON.stringify(map.simple)
 map.XSSIsafe = ")]}'" + map.simpleString
@@ -328,7 +334,7 @@ function testResolveSources(method, sync) {
 
     var mapUrl = "http://example.com/a/b/c/foo.js.map"
 
-    t.plan(1 + 9*3 + 4)
+    t.plan(1 + 11*3 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -499,6 +505,24 @@ function testResolveSources(method, sync) {
       isAsync()
     })
 
+    method(map.noSources, mapUrl, wrap(identity), function(error, result) {
+      t.error(error)
+      t.deepEqual(result, {
+        sourcesResolved: [],
+        sourcesContent: []
+      }, "noSources")
+      isAsync()
+    })
+
+    method(map.empty, mapUrl, wrap(identity), function(error, result) {
+      t.error(error)
+      t.deepEqual(result, {
+        sourcesResolved: [],
+        sourcesContent: []
+      }, "empty")
+      isAsync()
+    })
+
     method(map.simple, mapUrl, wrap(read(["non", "string"])), function(error, result) {
       t.error(error)
       t.deepEqual(result, {
@@ -575,7 +599,7 @@ function testResolve(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + 15*3 + 19*4 + 4)
+    t.plan(1 + 15*3 + 21*4 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -964,6 +988,20 @@ function testResolve(method, sync) {
         "/version.js",
         "//foo.org/baz.js"
       ], "mixed")
+      isAsync()
+    })
+
+    method(code.fileRelative, codeUrl, readMap(map.noSources), function(error, result) {
+      t.error(error)
+      t.deepEqual(result.sourcesResolved, [], "noSources")
+      t.deepEqual(result.sourcesContent, [], "noSources")
+      isAsync()
+    })
+
+    method(code.fileRelative, codeUrl, readMap(map.empty), function(error, result) {
+      t.error(error)
+      t.deepEqual(result.sourcesResolved, [], "noSources")
+      t.deepEqual(result.sourcesContent, [], "noSources")
       isAsync()
     })
 
