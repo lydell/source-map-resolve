@@ -124,10 +124,15 @@ void (function(root, factory) {
       callback = options
       options = {}
     }
-    var pending = map.sources.length
+    var pending = map.sources ? map.sources.length : 0
     var result = {
       sourcesResolved: [],
       sourcesContent:  []
+    }
+
+    if (pending === 0) {
+      callbackAsync(callback, null, result)
+      return
     }
 
     var done = function() {
@@ -156,6 +161,11 @@ void (function(root, factory) {
       sourcesResolved: [],
       sourcesContent:  []
     }
+
+    if (!map.sources || map.sources.length === 0) {
+      return result
+    }
+
     resolveSourcesHelper(map, mapUrl, options, function(fullUrl, sourceContent, index) {
       result.sourcesResolved[index] = fullUrl
       if (read !== null) {
@@ -170,6 +180,7 @@ void (function(root, factory) {
         }
       }
     })
+
     return result
   }
 
