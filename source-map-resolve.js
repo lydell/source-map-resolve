@@ -31,8 +31,9 @@ void (function(root, factory) {
   }
 
   function readSync(read, url, data) {
+    var readUrl = url
     try {
-      return String(read(url))
+      return String(read(readUrl))
     } catch (error) {
       error.sourceMapData = data
       throw error
@@ -51,7 +52,8 @@ void (function(root, factory) {
     if (!mapData || mapData.map) {
       return callbackAsync(callback, null, mapData)
     }
-    read(mapData.url, function(error, result) {
+    var readUrl = mapData.url
+    read(readUrl, function(error, result) {
       if (error) {
         error.sourceMapData = mapData
         return callback(error)
@@ -148,7 +150,8 @@ void (function(root, factory) {
         result.sourcesContent[index] = sourceContent
         callbackAsync(done, null)
       } else {
-        read(fullUrl, function(error, source) {
+        var readUrl = fullUrl
+        read(readUrl, function(error, source) {
           result.sourcesContent[index] = error ? error : String(source)
           done()
         })
@@ -172,8 +175,9 @@ void (function(root, factory) {
         if (typeof sourceContent === "string") {
           result.sourcesContent[index] = sourceContent
         } else {
+          var readUrl = fullUrl
           try {
-            result.sourcesContent[index] = String(read(fullUrl))
+            result.sourcesContent[index] = String(read(readUrl))
           } catch (error) {
             result.sourcesContent[index] = error
           }
@@ -228,7 +232,8 @@ void (function(root, factory) {
         sourcesRelativeTo: mapUrl,
         map: null
       }
-      read(mapUrl, function(error, result) {
+      var readUrl = mapUrl
+      read(readUrl, function(error, result) {
         if (error) {
           error.sourceMapData = data
           return callback(error)
