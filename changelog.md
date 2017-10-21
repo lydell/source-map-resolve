@@ -1,3 +1,16 @@
+### Version 0.5.1 (2017-10-21) ###
+
+- Fixed: URLs are now decoded before being passed to `read` in Node.js. This
+  allows reading files with spaces, for example.
+- Fixed: Missing or empty `sources` fields (such as `sources: []`) in source
+  maps are now handled. Previously, such source maps would cause crashes or
+  callbacks never bing called. Now, an empty result is produced:
+
+  ```js
+  sourcesResolved: [],
+  sourcesContent: []
+  ```
+
 ### Version 0.5.0 (2016-02-28) ###
 
 - Improved: Errors now have a `sourceMapData` property that contain as much as
