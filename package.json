@@ -29,7 +29,7 @@
   "dependencies": {
     "decode-uri-component": "^0.2.0",
     "source-map-url": "^0.4.0",
-    "atob": "^2.0.0",
+    "atob": "^2.1.1",
     "urix": "^0.1.0",
     "resolve-url": "^0.2.1"
   },
