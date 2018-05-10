@@ -22,23 +22,23 @@
   "browser": "source-map-resolve.js",
   "scripts": {
     "lint": "jshint lib/ test/",
-    "unit": "node test/source-map-resolve.js && node test/windows.js && node test/read.js",
+    "unit": "node test/source-map-resolve.js && node test/windows.js",
     "test": "npm run lint && npm run unit",
     "build": "node generate-source-map-resolve.js"
   },
   "dependencies": {
+    "atob": "^2.1.1",
     "decode-uri-component": "^0.2.0",
+    "resolve-url": "^0.2.1",
     "source-map-url": "^0.4.0",
-    "atob": "^2.0.0",
-    "urix": "^0.1.0",
-    "resolve-url": "^0.2.1"
+    "urix": "^0.1.0"
   },
   "devDependencies": {
-    "tape": "^4.4.0",
-    "jshint": "~2.9.1",
-    "setimmediate": "^1.0.4",
-    "Base64": "^0.3.0",
-    "simple-asyncify": "^1.0.0"
+    "Base64": "1.0.1",
+    "jshint": "2.9.5",
+    "setimmediate": "1.0.5",
+    "simple-asyncify": "1.0.0",
+    "tape": "4.9.0"
   },
   "testling": {
     "files": "test/source-map-resolve.js",
