@@ -61,10 +61,29 @@ var map = {
     sources:  [],
     names:    []
   },
+  utf8 : {
+    version:        3,
+    file:            "bundle.js",
+    sources:        ["hello.js"],
+    sourcesContent: ["// 🐸💗🐻\nexport const github =\n  \"The world's leading software " +
+                     "development platform.\" +\n  '◆冃.狌.交.伖，◆真 人】约会';\n"],
+    names:          [],
+    mappings:       ";;;;AAAA;AACA,AAAY,MAAC,MAAM;EACjB,oDAAoD;EACpD,kBAAkB;;;;"
+  },
   empty: {}
 }
 map.simpleString = JSON.stringify(map.simple)
 map.XSSIsafe = ")]}'" + map.simpleString
+
+var utf8SourceMappingURL = "data:application/json;charset=utf-8;base64," +
+  "eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYnVuZGxlLmpzIiwic291cmNlcy" +
+  "I6WyJoZWxsby5qcyJdLCJzb3VyY2VzQ29udGVudCI6WyIvLyDwn5C4" +
+  "8J+Sl/CfkLtcbmV4cG9ydCBjb25zdCBnaXRodWIgPVxuICBcIlRoZS" +
+  "B3b3JsZCdzIGxlYWRpbmcgc29mdHdhcmUgZGV2ZWxvcG1lbnQgcGxh" +
+  "dGZvcm0uXCIgK1xuICAn4peG5YaDLueLjC7kuqQu5LyW77yM4peG55" +
+  "yfIOS6uuOAkee6puS8mic7XG4iXSwibmFtZXMiOltdLCJtYXBwaW5n" +
+  "cyI6Ijs7OztBQUFBO0FBQ0EsQUFBWSxNQUFDLE1BQU07RUFDakIsb0" +
+  "RBQW9EO0VBQ3BELGtCQUFrQjs7OzsifQ=="
 
 var code = {
   fileRelative:       u("foo.js.map"),
@@ -88,6 +107,7 @@ var code = {
   dataUriXSSIsafe:    u("data:application/json," + ")%5D%7D%27" +
                         "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
                         "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D"),
+  dataUtf8:           u(utf8SourceMappingURL),
   dataUriEmpty:       u("data:"),
   noMap:              ""
 }
