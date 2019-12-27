@@ -91,11 +91,11 @@ void (function(root, factory) {
 
   /**
    * JSON text exchanged between systems that are not part of a closed ecosystem
-   * MUST be encoded using UTF-8
+   * MUST be encoded using UTF-8.
    * 
    * {@link https://tools.ietf.org/html/rfc8259#section-8.1 | Character Encoding}
    */
-  var jsonCharacterEncoding = 'utf-8'
+  var jsonCharacterEncoding = "utf-8"
 
   function base64ToBuf(b64) {
     var binStr = atob(b64)
@@ -108,18 +108,12 @@ void (function(root, factory) {
   }
 
   function decodeBase64String(b64) {
-    if(!(TextDecoder && Uint8Array)){
-      console.warn('TextDecoder or Uint8Array are not supported in your runtime.' +
-        ' So we cannot provide the function to decode UTF-8.' +
-        ' You may encounter garbled characters' +
-        ' when using characters outside the US-ASCII character set.')
+    if (typeof TextDecoder === "undefined" || typeof Uint8Array === "undefined") {
       return atob(b64)
     }
     var buf = base64ToBuf(b64);
-    /**
-     * `decoder.decode` method will throw a `DOMException` with the `"EncodingError"` value
-     * when an coding error is found.
-     */
+    // Note: `decoder.decode` method will throw a `DOMException` with the
+    // `"EncodingError"` value when an coding error is found.
     var decoder = new TextDecoder(jsonCharacterEncoding, {fatal: true})
     return decoder.decode(buf); 
   }
@@ -147,9 +141,7 @@ void (function(root, factory) {
         throw error
       }
       data.map = parseMapToJSON(
-        lastParameter === ";base64" ?
-          decodeBase64String(encoded) :
-          decodeURIComponent(encoded),
+        lastParameter === ";base64" ? decodeBase64String(encoded) : decodeURIComponent(encoded),
         data
       )
       return data
