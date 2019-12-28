@@ -20,6 +20,10 @@
   "repository": "lydell/source-map-resolve",
   "main": "lib/source-map-resolve-node.js",
   "browser": "source-map-resolve.js",
+  "files": [
+    "lib",
+    "source-map-resolve.js"
+  ],
   "scripts": {
     "lint": "jshint lib/ test/",
     "unit": "node test/source-map-resolve.js && node test/windows.js",
