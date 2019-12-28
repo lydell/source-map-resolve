@@ -41,6 +41,7 @@
     "define": false,
     "window": false,
     "atob": true,
-    "JSON": false
+    "JSON": false,
+    "TextDecoder": true
   }
 }

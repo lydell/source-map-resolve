@@ -1,4 +1,5 @@
-// Copyright 2014, 2015, 2016, 2017 Simon Lydell
+// Copyright 2014, 2015, 2016, 2017, 2019 Simon Lydell
+// Copyright 2019 ZHAO Jinxiang
 // X11 (“MIT”) Licensed. (See LICENSE.)
 
 var test         = require("tape")
@@ -61,6 +62,12 @@ var map = {
     sources:  [],
     names:    []
   },
+  utf8 : {
+    mappings:       "AAAA",
+    sources:        ["foo.js"],
+    sourcesContent: ["中文😊"],
+    names:          []
+  },
   empty: {}
 }
 map.simpleString = JSON.stringify(map.simple)
@@ -75,7 +82,8 @@ var code = {
                         "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
                         "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D"),
   base64:             u("data:application/json;base64," +
-                        "eyJtYXBwaW5ncyI6IkFBQUEiLCJzb3VyY2VzIjpbImZvby5qcyJdLCJuYW1lcyI6W119"),
+                        "eyJtYXBwaW5ncyI6IkFBQUEiLCJzb3VyY2VzIjpbImZvby5qcyJdLCJzb3VyY2VzQ29udGVudCI6WyLkuK3mlofwn5iKIl0sIm5hbWVzIjpbXX0="), // jshint ignore:line
+  base64InvalidUtf8:  u("data:application/json;base64,abc"),
   dataUriText:        u("data:text/json," +
                         "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
                         "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D"),
@@ -85,6 +93,7 @@ var code = {
   dataUriNoMime:      u("data:,foo"),
   dataUriInvalidMime: u("data:text/html,foo"),
   dataUriInvalidJSON: u("data:application/json,foo"),
+  dataUriInvalidCode: u("data:application/json,%"),
   dataUriXSSIsafe:    u("data:application/json," + ")%5D%7D%27" +
                         "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
                         "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D"),
@@ -99,7 +108,7 @@ function testResolveSourceMap(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + 12*3 + 6*4)
+    t.plan(1 + 12*3 + 8*4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -171,11 +180,24 @@ function testResolveSourceMap(method, sync) {
       t.error(error)
       t.deepEqual(result, {
         sourceMappingURL:  "data:application/json;base64," +
-                           "eyJtYXBwaW5ncyI6IkFBQUEiLCJzb3VyY2VzIjpbImZvby5qcyJdLCJuYW1lcyI6W119",
+                           "eyJtYXBwaW5ncyI6IkFBQUEiLCJzb3VyY2VzIjpbImZvby5qcyJdLCJzb3VyY2VzQ29udGVudCI6WyLkuK3mlofwn5iKIl0sIm5hbWVzIjpbXX0=", // jshint ignore:line
         url:               null,
         sourcesRelativeTo: codeUrl,
-        map:               map.simple
+        map:               map.utf8
       }, "base64")
+      isAsync()
+    })
+
+    method(code.base64InvalidUtf8, codeUrl, wrap(Throws), function(error, result) {
+      t.deepEqual(error.sourceMapData, {
+        sourceMappingURL:  "data:application/json;base64,abc",
+        url:               null,
+        sourcesRelativeTo: codeUrl,
+        map:               "abc"
+      }, "base64InvalidUtf8 .sourceMapData")
+      t.ok(error instanceof TypeError && error.message !== "data:application/json;base64,abc",
+        "base64InvalidUtf8")
+      t.notOk(result)
       isAsync()
     })
 
@@ -238,6 +260,19 @@ function testResolveSourceMap(method, sync) {
       }, "dataUriInvalidJSON .sourceMapData")
       t.ok(error instanceof SyntaxError && error.message !== "data:application/json,foo",
         "dataUriInvalidJSON")
+      t.notOk(result)
+      isAsync()
+    })
+
+    method(code.dataUriInvalidCode, codeUrl, wrap(Throws), function(error, result) {
+      t.deepEqual(error.sourceMapData, {
+        sourceMappingURL:  "data:application/json,%",
+        url:               null,
+        sourcesRelativeTo: codeUrl,
+        map:               "%"
+      }, "dataUriInvalidCode .sourceMapData")
+      t.ok(error instanceof URIError && error.message !== "data:application/json,%",
+        "dataUriInvalidCode")
       t.notOk(result)
       isAsync()
     })
@@ -599,7 +634,7 @@ function testResolve(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + 15*3 + 21*4 + 4)
+    t.plan(1 + 15*3 + 23*4 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -683,13 +718,26 @@ function testResolve(method, sync) {
       t.error(error)
       t.deepEqual(result, {
         sourceMappingURL:  "data:application/json;base64," +
-                           "eyJtYXBwaW5ncyI6IkFBQUEiLCJzb3VyY2VzIjpbImZvby5qcyJdLCJuYW1lcyI6W119",
+                           "eyJtYXBwaW5ncyI6IkFBQUEiLCJzb3VyY2VzIjpbImZvby5qcyJdLCJzb3VyY2VzQ29udGVudCI6WyLkuK3mlofwn5iKIl0sIm5hbWVzIjpbXX0=", // jshint ignore:line
         url:               null,
         sourcesRelativeTo: codeUrl,
-        map:               map.simple,
+        map:               map.utf8,
         sourcesResolved:   ["http://example.com/a/b/c/foo.js"],
-        sourcesContent:    ["http://example.com/a/b/c/foo.js"]
+        sourcesContent:    ["中文😊"]
       }, "base64")
+      isAsync()
+    })
+
+    method(code.base64InvalidUtf8, codeUrl, wrap(Throws), function(error, result) {
+      t.deepEqual(error.sourceMapData, {
+        sourceMappingURL:  "data:application/json;base64,abc",
+        url:               null,
+        sourcesRelativeTo: codeUrl,
+        map:               "abc"
+      }, "base64InvalidUtf8 .sourceMapData")
+      t.ok(error instanceof TypeError && error.message !== "data:application/json;base64,abc",
+        "base64InvalidUtf8")
+      t.notOk(result)
       isAsync()
     })
 
@@ -756,6 +804,19 @@ function testResolve(method, sync) {
       }, "dataUriInvalidJSON .sourceMapData")
       t.ok(error instanceof SyntaxError && error.message !== "data:application/json,foo",
         "dataUriInvalidJSON")
+      t.notOk(result)
+      isAsync()
+    })
+
+    method(code.dataUriInvalidCode, codeUrl, wrap(Throws), function(error, result) {
+      t.deepEqual(error.sourceMapData, {
+        sourceMappingURL:  "data:application/json,%",
+        url:               null,
+        sourcesRelativeTo: codeUrl,
+        map:               "%"
+      }, "dataUriInvalidCode .sourceMapData")
+      t.ok(error instanceof URIError && error.message !== "data:application/json,%",
+        "dataUriInvalidCode")
       t.notOk(result)
       isAsync()
     })
