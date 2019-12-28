@@ -82,6 +82,7 @@ var code = {
                         "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D"),
   base64:             u("data:application/json;base64," +
                         "eyJtYXBwaW5ncyI6IkFBQUEiLCJzb3VyY2VzIjpbImZvby5qcyJdLCJzb3VyY2VzQ29udGVudCI6WyLkuK3mlofwn5iKIl0sIm5hbWVzIjpbXX0="), // jshint ignore:line
+  base64InvalidUtf8:  u("data:application/json;base64,abc"),
   dataUriText:        u("data:text/json," +
                         "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
                         "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D"),
@@ -106,7 +107,7 @@ function testResolveSourceMap(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + 12*3 + 7*4)
+    t.plan(1 + 12*3 + 8*4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -183,6 +184,19 @@ function testResolveSourceMap(method, sync) {
         sourcesRelativeTo: codeUrl,
         map:               map.utf8
       }, "base64")
+      isAsync()
+    })
+
+    method(code.base64InvalidUtf8, codeUrl, wrap(Throws), function(error, result) {
+      t.deepEqual(error.sourceMapData, {
+        sourceMappingURL:  "data:application/json;base64,abc",
+        url:               null,
+        sourcesRelativeTo: codeUrl,
+        map:               "abc"
+      }, "base64InvalidUtf8 .sourceMapData")
+      t.ok(error instanceof TypeError && error.message !== "data:application/json;base64,abc",
+        "base64InvalidUtf8")
+      t.notOk(result)
       isAsync()
     })
 
@@ -619,7 +633,7 @@ function testResolve(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + 15*3 + 22*4 + 4)
+    t.plan(1 + 15*3 + 23*4 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -710,6 +724,19 @@ function testResolve(method, sync) {
         sourcesResolved:   ["http://example.com/a/b/c/foo.js"],
         sourcesContent:    ["中文😊"]
       }, "base64")
+      isAsync()
+    })
+
+    method(code.base64InvalidUtf8, codeUrl, wrap(Throws), function(error, result) {
+      t.deepEqual(error.sourceMapData, {
+        sourceMappingURL:  "data:application/json;base64,abc",
+        url:               null,
+        sourcesRelativeTo: codeUrl,
+        map:               "abc"
+      }, "base64InvalidUtf8 .sourceMapData")
+      t.ok(error instanceof TypeError && error.message !== "data:application/json;base64,abc",
+        "base64InvalidUtf8")
+      t.notOk(result)
       isAsync()
     })
 
