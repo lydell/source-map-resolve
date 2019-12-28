@@ -91,6 +91,7 @@ var code = {
   dataUriNoMime:      u("data:,foo"),
   dataUriInvalidMime: u("data:text/html,foo"),
   dataUriInvalidJSON: u("data:application/json,foo"),
+  dataUriInvalidCode: u("data:application/json,%"),
   dataUriXSSIsafe:    u("data:application/json," + ")%5D%7D%27" +
                         "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
                         "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D"),
@@ -105,7 +106,7 @@ function testResolveSourceMap(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + 12*3 + 6*4)
+    t.plan(1 + 12*3 + 7*4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -244,6 +245,19 @@ function testResolveSourceMap(method, sync) {
       }, "dataUriInvalidJSON .sourceMapData")
       t.ok(error instanceof SyntaxError && error.message !== "data:application/json,foo",
         "dataUriInvalidJSON")
+      t.notOk(result)
+      isAsync()
+    })
+
+    method(code.dataUriInvalidCode, codeUrl, wrap(Throws), function(error, result) {
+      t.deepEqual(error.sourceMapData, {
+        sourceMappingURL:  "data:application/json,%",
+        url:               null,
+        sourcesRelativeTo: codeUrl,
+        map:               "%"
+      }, "dataUriInvalidCode .sourceMapData")
+      t.ok(error instanceof URIError && error.message !== "data:application/json,%",
+        "dataUriInvalidCode")
       t.notOk(result)
       isAsync()
     })
@@ -605,7 +619,7 @@ function testResolve(method, sync) {
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
-    t.plan(1 + 15*3 + 21*4 + 4)
+    t.plan(1 + 15*3 + 22*4 + 4)
 
     t.equal(typeof method, "function", "is a function")
 
@@ -762,6 +776,19 @@ function testResolve(method, sync) {
       }, "dataUriInvalidJSON .sourceMapData")
       t.ok(error instanceof SyntaxError && error.message !== "data:application/json,foo",
         "dataUriInvalidJSON")
+      t.notOk(result)
+      isAsync()
+    })
+
+    method(code.dataUriInvalidCode, codeUrl, wrap(Throws), function(error, result) {
+      t.deepEqual(error.sourceMapData, {
+        sourceMappingURL:  "data:application/json,%",
+        url:               null,
+        sourcesRelativeTo: codeUrl,
+        map:               "%"
+      }, "dataUriInvalidCode .sourceMapData")
+      t.ok(error instanceof URIError && error.message !== "data:application/json,%",
+        "dataUriInvalidCode")
       t.notOk(result)
       isAsync()
     })

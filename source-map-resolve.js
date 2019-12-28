@@ -140,10 +140,15 @@ void (function(root, factory) {
         error.sourceMapData = data
         throw error
       }
-      data.map = parseMapToJSON(
-        lastParameter === ";base64" ? decodeBase64String(encoded) : decodeURIComponent(encoded),
-        data
-      )
+      try {
+        data.map = parseMapToJSON(
+          lastParameter === ";base64" ? decodeBase64String(encoded) : decodeURIComponent(encoded),
+          data
+        )
+      } catch (error) {
+        error.sourceMapData = data
+        throw error
+      }
       return data
     }
 
