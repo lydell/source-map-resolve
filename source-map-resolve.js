@@ -79,9 +79,9 @@ void (function(root, factory) {
 
   /**
    * The media type for JSON text is application/json.
-   * 
+   *
    * {@link https://tools.ietf.org/html/rfc8259#section-11 | IANA Considerations }
-   * 
+   *
    * `text/json` is non-standard media type
    */
   var jsonMimeTypeRegex = /^(?:application|text)\/json$/
@@ -89,7 +89,7 @@ void (function(root, factory) {
   /**
    * JSON text exchanged between systems that are not part of a closed ecosystem
    * MUST be encoded using UTF-8.
-   * 
+   *
    * {@link https://tools.ietf.org/html/rfc8259#section-8.1 | Character Encoding}
    */
   var jsonCharacterEncoding = "utf-8"
@@ -112,7 +112,7 @@ void (function(root, factory) {
     // Note: `decoder.decode` method will throw a `DOMException` with the
     // `"EncodingError"` value when an coding error is found.
     var decoder = new TextDecoder(jsonCharacterEncoding, {fatal: true})
-    return decoder.decode(buf); 
+    return decoder.decode(buf);
   }
 
   function resolveSourceMapHelper(code, codeUrl) {
