@@ -1,6 +1,3 @@
-// Copyright 2014, 2017 Simon Lydell
-// X11 (“MIT”) Licensed. (See LICENSE.)
-
 var fs = require("fs")
 
 var template = fs.readFileSync("source-map-resolve.js.template").toString()

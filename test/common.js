@@ -1,6 +1,3 @@
-// Copyright 2014 Simon Lydell
-// X11 (“MIT”) Licensed. (See LICENSE.)
-
 function u(url) {
   return "code\n/*# sourceMappingURL=" + url + " */"
 }

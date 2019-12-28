@@ -1,7 +1,3 @@
-// Copyright 2014, 2015, 2016, 2017, 2019 Simon Lydell
-// Copyright 2019 ZHAO Jinxiang
-// X11 (“MIT”) Licensed. (See LICENSE.)
-
 var test         = require("tape")
 var asyncify     = require("simple-asyncify")
 var common       = require("./common")

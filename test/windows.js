@@ -1,6 +1,3 @@
-// Copyright 2014 Simon Lydell
-// X11 (“MIT”) Licensed. (See LICENSE.)
-
 var path         = require("path")
 var test         = require("tape")
 var asyncify     = require("simple-asyncify")
