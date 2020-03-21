@@ -11,12 +11,6 @@ var asyncify     = common.asyncify
 
 var sourceMapResolve = require("../")
 
-// Polyfills.
-require("setimmediate")
-if (typeof window !== "undefined" && !window.atob) {
-  window.atob = require("Base64").atob
-}
-
 "use strict"
 
 var map = {
