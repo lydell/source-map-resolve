@@ -23,7 +23,7 @@
   ],
   "scripts": {
     "lint": "jshint index.js test/",
-    "unit": "node test/index.js && node test/windows.js",
+    "unit": "node test/index.js && node test/read.js && node test/windows.js",
     "test": "npm run lint && npm run unit"
   },
   "dependencies": {
