@@ -1,5 +1,4 @@
 var test         = require("tape")
-var asyncify     = require("simple-asyncify")
 var common       = require("./common")
 var u1           = common.u1
 var u2           = common.u2
@@ -8,6 +7,7 @@ var u4           = common.u4
 var read         = common.read
 var Throws       = common.Throws
 var identity     = common.identity
+var asyncify     = common.asyncify
 
 var sourceMapResolve = require("../")
 

@@ -28,6 +28,22 @@ function identity(x) {
   return x
 }
 
+function asyncify(syncFn) {
+  return function() {
+    var args = Array.prototype.slice.call(arguments)
+    var callback = args.pop()
+    var result
+    setImmediate(function() {
+      try {
+        result = syncFn.apply(this, args)
+      } catch (error) {
+        return callback(error)
+      }
+      callback(null, result)
+    })
+  }
+}
+
 module.exports = {
   u1:       u1,
   u2:       u2,
@@ -35,5 +51,6 @@ module.exports = {
   u4:       u4,
   read:     read,
   Throws:   Throws,
-  identity: identity
+  identity: identity,
+  asyncify: asyncify
 }

@@ -34,7 +34,6 @@
     "Base64": "1.1.0",
     "jshint": "2.10.3",
     "setimmediate": "1.0.5",
-    "simple-asyncify": "1.0.0",
     "tape": "4.12.1"
   }
 }
