@@ -19,7 +19,7 @@
   ],
   "repository": "lydell/source-map-resolve",
   "files": [
-    "lib"
+    "index.js"
   ],
   "scripts": {
     "lint": "jshint index.js test/",
