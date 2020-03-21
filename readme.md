@@ -60,18 +60,7 @@ sourceMapResolve.resolve(code, "/js/foo.js", fs.readFile, function(error, result
 Installation
 ============
 
-- `npm install source-map-resolve`
-- `bower install source-map-resolve`
-- `component install lydell/source-map-resolve`
-
-Works with CommonJS, AMD and browser globals, through UMD.
-
-Note: This module requires `setImmediate` and `atob`.
-Use polyfills if needed, such as:
-
-- <https://github.com/NobleJS/setImmediate>
-- <https://github.com/davidchambers/Base64.js>
-
+`npm install source-map-resolve`
 
 Usage
 =====
@@ -196,33 +185,6 @@ source map: By sending the `SourceMap: <url>` header along with the generated
 file. Since this module doesn’t retrive the generated code for you (instead
 _you_ give the generated code to the module), it’s up to you to look for such a
 header when you retrieve the file (should the need arise).
-
-
-Development
-===========
-
-Tests
------
-
-First off, run `npm install` to install testing modules and browser polyfills.
-
-`npm test` lints the code and runs the test suite in Node.js.
-
-x-package.json5
----------------
-
-package.json, component.json and bower.json are all generated from
-x-package.json5 by using [`xpkg`]. Only edit x-package.json5, and remember to
-run `xpkg` before commiting!
-
-[`xpkg`]: https://github.com/kof/node-xpkg
-
-Generating the browser version
-------------------------------
-
-source-map-resolve.js is generated from source-map-resolve-node.js and
-source-map-resolve-template.js. Only edit the two latter files, _not_
-source-map-resolve.js! To generate it, run `npm run build`.
 
 
 License

@@ -1,7 +1,7 @@
 var test         = require("tape")
 var asyncify     = require("simple-asyncify")
 var common       = require("./common")
-var u            = common.u
+var u1           = common.u1
 
 var sourceMapResolve = require("../")
 
@@ -35,7 +35,7 @@ function testResolveSourceMap(method, sync) {
       "built files/operators map.json": "{}"
     })
 
-    method(u(mapUrl), codeUrl, read, function(error) {
+    method(u1(mapUrl), codeUrl, read, function(error) {
       t.error(error)
     })
 
@@ -90,7 +90,7 @@ function testResolve(method, sync) {
       "source files/operators:+-<>%.coffee": "source code"
     })
 
-    method(u(mapUrl), codeUrl, read, function(error) {
+    method(u1(mapUrl), codeUrl, read, function(error) {
       t.error(error)
     })
 

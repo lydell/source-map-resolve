@@ -1,7 +1,10 @@
 var test         = require("tape")
 var asyncify     = require("simple-asyncify")
 var common       = require("./common")
-var u            = common.u
+var u1           = common.u1
+var u2           = common.u2
+var u3           = common.u3
+var u4           = common.u4
 var read         = common.read
 var Throws       = common.Throws
 var identity     = common.identity
@@ -70,30 +73,30 @@ map.simpleString = JSON.stringify(map.simple)
 map.XSSIsafe = ")]}'" + map.simpleString
 
 var code = {
-  fileRelative:       u("foo.js.map"),
-  domainRelative:     u("/foo.js.map"),
-  schemeRelative:     u("//foo.org/foo.js.map"),
-  absolute:           u("https://foo.org/foo.js.map"),
-  dataUri:            u("data:application/json," +
+  fileRelative:       u1("foo.js.map"),
+  domainRelative:     u2("/foo.js.map"),
+  schemeRelative:     u3("//foo.org/foo.js.map"),
+  absolute:           u4("https://foo.org/foo.js.map"),
+  dataUri:            u1("data:application/json," +
                         "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
                         "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D"),
-  base64:             u("data:application/json;base64," +
+  base64:             u2("data:application/json;base64," +
                         "eyJtYXBwaW5ncyI6IkFBQUEiLCJzb3VyY2VzIjpbImZvby5qcyJdLCJzb3VyY2VzQ29udGVudCI6WyLkuK3mlofwn5iKIl0sIm5hbWVzIjpbXX0="), // jshint ignore:line
-  base64InvalidUtf8:  u("data:application/json;base64,abc"),
-  dataUriText:        u("data:text/json," +
+  base64InvalidUtf8:  u3("data:application/json;base64,abc"),
+  dataUriText:        u4("data:text/json," +
                         "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
                         "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D"),
-  dataUriParameter:   u("data:application/json;charset=UTF-8;foo=bar," +
+  dataUriParameter:   u1("data:application/json;charset=UTF-8;foo=bar," +
                         "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
                         "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D"),
-  dataUriNoMime:      u("data:,foo"),
-  dataUriInvalidMime: u("data:text/html,foo"),
-  dataUriInvalidJSON: u("data:application/json,foo"),
-  dataUriInvalidCode: u("data:application/json,%"),
-  dataUriXSSIsafe:    u("data:application/json," + ")%5D%7D%27" +
+  dataUriNoMime:      u2("data:,foo"),
+  dataUriInvalidMime: u3("data:text/html,foo"),
+  dataUriInvalidJSON: u4("data:application/json,foo"),
+  dataUriInvalidCode: u1("data:application/json,%"),
+  dataUriXSSIsafe:    u2("data:application/json," + ")%5D%7D%27" +
                         "%7B%22mappings%22%3A%22AAAA%22%2C%22sources%22%3A%5B%22" +
                         "foo.js%22%5D%2C%22names%22%3A%5B%5D%7D"),
-  dataUriEmpty:       u("data:"),
+  dataUriEmpty:       u3("data:"),
   noMap:              ""
 }
 

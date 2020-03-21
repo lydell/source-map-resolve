@@ -2,7 +2,9 @@ var path         = require("path")
 var test         = require("tape")
 var asyncify     = require("simple-asyncify")
 var common       = require("./common")
-var u            = common.u
+var u1           = common.u1
+var u2           = common.u2
+var u3           = common.u3
 var read         = common.read
 var identity     = common.identity
 
@@ -26,7 +28,7 @@ function testResolveSourceMap(method, sync) {
     var map = {}
     var readMap = wrap(read(JSON.stringify(map)))
 
-    method(u("foo.js.map"), codeUrl, readMap, function(error, result) {
+    method(u1("foo.js.map"), codeUrl, readMap, function(error, result) {
       t.error(error)
       t.deepEqual(result, {
         sourceMappingURL:  "foo.js.map",
@@ -36,7 +38,7 @@ function testResolveSourceMap(method, sync) {
       })
     })
 
-    method(u("/foo.js.map"), codeUrl, readMap, function(error, result) {
+    method(u2("/foo.js.map"), codeUrl, readMap, function(error, result) {
       t.error(error)
       t.deepEqual(result, {
         sourceMappingURL:  "/foo.js.map",
@@ -46,7 +48,7 @@ function testResolveSourceMap(method, sync) {
       })
     })
 
-    method(u("../foo.js.map"), codeUrl, readMap, function(error, result) {
+    method(u3("../foo.js.map"), codeUrl, readMap, function(error, result) {
       t.error(error)
       t.deepEqual(result, {
         sourceMappingURL:  "../foo.js.map",
@@ -119,7 +121,7 @@ function testResolve(method, sync) {
     }
     var readMap = wrapMap(read(JSON.stringify(map)), identity)
 
-    method(u("foo.js.map"), codeUrl, readMap, function(error, result) {
+    method(u1("foo.js.map"), codeUrl, readMap, function(error, result) {
       t.error(error)
       t.deepEqual(result, {
         sourceMappingURL:  "foo.js.map",
@@ -131,7 +133,7 @@ function testResolve(method, sync) {
       })
     })
 
-    method(u("/foo.js.map"), codeUrl, readMap, function(error, result) {
+    method(u2("/foo.js.map"), codeUrl, readMap, function(error, result) {
       t.error(error)
       t.deepEqual(result, {
         sourceMappingURL:  "/foo.js.map",
@@ -143,7 +145,7 @@ function testResolve(method, sync) {
       })
     })
 
-    method(u("../foo.js.map"), codeUrl, readMap, function(error, result) {
+    method(u3("../foo.js.map"), codeUrl, readMap, function(error, result) {
       t.error(error)
       t.deepEqual(result, {
         sourceMappingURL:  "../foo.js.map",
