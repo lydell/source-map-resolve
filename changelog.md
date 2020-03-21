@@ -1,3 +1,9 @@
+### Version 0.6.0 (2020-03-21) ###
+
+- Removed: The browser version. Only Node.js is now supported.
+- Improved: Three old, weird, tiny dependencies were inlined, which should
+  decrease install size.
+
 ### Version 0.5.3 (2019-12-28) ###
 
 - Fixed: base64 encoded source maps now correctly decodes as utf-8. Previously,
