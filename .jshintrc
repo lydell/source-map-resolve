@@ -3,7 +3,8 @@
   "camelcase": true,
   "curly": false,
   "eqeqeq": true,
-  "es3": true,
+  "es3": false,
+  "esversion": 2016,
   "forin": true,
   "immed": false,
   "indent": false,
@@ -29,6 +30,8 @@
   "globalstrict": true,
   "smarttabs": true,
   "sub": true,
+
+  "loopfunc" : true,
 
   "node": true,
   "globals": {

@@ -213,7 +213,7 @@ function resolveSources(map, mapUrl, read, options, callback) {
     }
   }
 
-  resolveSourcesHelper(map, mapUrl, options, function(fullUrl, sourceContent, index) {
+  for (let {fullUrl, sourceContent, index} of resolveSourcesHelper(map, mapUrl, options)) {
     result.sourcesResolved[index] = fullUrl
     if (typeof sourceContent === "string") {
       result.sourcesContent[index] = sourceContent
@@ -225,7 +225,7 @@ function resolveSources(map, mapUrl, read, options, callback) {
         done()
       })
     }
-  })
+  }
 }
 
 function resolveSourcesSync(map, mapUrl, read, options) {
@@ -238,7 +238,7 @@ function resolveSourcesSync(map, mapUrl, read, options) {
     return result
   }
 
-  resolveSourcesHelper(map, mapUrl, options, function(fullUrl, sourceContent, index) {
+  for (let {fullUrl, sourceContent, index} of resolveSourcesHelper(map, mapUrl, options)) {
     result.sourcesResolved[index] = fullUrl
     if (read !== null) {
       if (typeof sourceContent === "string") {
@@ -252,14 +252,14 @@ function resolveSourcesSync(map, mapUrl, read, options) {
         }
       }
     }
-  })
+  }
 
   return result
 }
 
 var endingSlash = /\/?$/
 
-function resolveSourcesHelper(map, mapUrl, options, fn) {
+function* resolveSourcesHelper(map, mapUrl, options) {
   options = options || {}
   mapUrl = convertWindowsPath(mapUrl)
   var fullUrl
@@ -283,7 +283,7 @@ function resolveSourcesHelper(map, mapUrl, options, fn) {
       fullUrl = resolveUrl(mapUrl, sourceRoot.replace(endingSlash, "/"), map.sources[index])
     }
     sourceContent = (map.sourcesContent || [])[index]
-    fn(fullUrl, sourceContent, index)
+    yield {fullUrl, sourceContent, index}
   }
 }
 
