@@ -267,11 +267,7 @@ function* resolveSourcesHelper(map, mapUrl, options) {
 
 
 
-function resolve(code, codeUrl, read, options, callback) {
-  if (typeof options === "function") {
-    callback = options
-    options = {}
-  }
+async function resolve(code, codeUrl, read, options) {
   if (code === null) {
     var mapUrl = codeUrl
     var data = {
@@ -281,44 +277,28 @@ function resolve(code, codeUrl, read, options, callback) {
       map: null
     }
     var readUrl = customDecodeUriComponent(mapUrl)
-    read(readUrl)
-      .then(function(result) {
-        data.map = String(result)
-        try {
-          data.map = parseMapToJSON(data.map, data)
-        } catch (error) {
-          return callback(error)
-        }
-        return _resolveSources(data)
-      })
-      .catch(function(error) {
-        error.sourceMapData = data
-        return callback(error)
-      });
+    try {
+      const result = await read(readUrl)
+      data.map = String(result)
+      data.map = parseMapToJSON(data.map, data)
+      return await _resolveSources(data)
+    } catch (error) {
+      error.sourceMapData = data
+      throw error
+    }
   } else {
-    resolveSourceMap(code, codeUrl, read)
-      .then(function(mapData) {
-        if (!mapData) {
-          callback(null, null)
-        } else {
-          return _resolveSources(mapData)
-        }
-      })
-      .catch(function(error) {
-        callback(error)
-      });
+    const mapData = await resolveSourceMap(code, codeUrl, read)
+    if (!mapData) {
+      return null
+    }
+    return await _resolveSources(mapData)
   }
 
-  function _resolveSources(mapData) {
-    return resolveSources(mapData.map, mapData.sourcesRelativeTo, read, options)
-      .then(result => {
-        mapData.sourcesResolved = result.sourcesResolved
-        mapData.sourcesContent  = result.sourcesContent
-        callback(null, mapData)
-      })
-      .catch(error => {
-        callback(error)
-      })
+  async function _resolveSources(mapData) {
+    const result = await resolveSources(mapData.map, mapData.sourcesRelativeTo, read, options)
+    mapData.sourcesResolved = result.sourcesResolved
+    mapData.sourcesContent  = result.sourcesContent
+    return mapData
   }
 }
 
