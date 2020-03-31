@@ -20,10 +20,6 @@ function customDecodeUriComponent(string) {
   return decodeUriComponentLib(string.replace(/\+/g, "%2B"))
 }
 
-function callbackAsync(callback, error, result) {
-  setImmediate(function() { callback(error, result) })
-}
-
 function parseMapToJSON(string, data) {
   try {
     return JSON.parse(string.replace(/^\)\]\}'/, ""))
@@ -67,31 +63,22 @@ function getSourceMappingUrl(code) {
 
 
 
-function resolveSourceMap(code, codeUrl, read, callback) {
-  var mapData
-  try {
-    mapData = resolveSourceMapHelper(code, codeUrl)
-  } catch (error) {
-    return callbackAsync(callback, error)
-  }
+async function resolveSourceMap(code, codeUrl, read) {
+  var mapData = resolveSourceMapHelper(code, codeUrl)
+
   if (!mapData || mapData.map) {
-    return callbackAsync(callback, null, mapData)
+    return mapData
   }
   var readUrl = customDecodeUriComponent(mapData.url)
-  read(readUrl)
-    .then(function(result) {
-      mapData.map = String(result)
-      try {
-        mapData.map = parseMapToJSON(mapData.map, mapData)
-        callback(null, mapData)
-      } catch (error) {
-        callback(error)
-      }
-    })
-    .catch(function(error) {
-      error.sourceMapData = mapData
-      callback(error)
-    });
+  try {
+    const result = await read(readUrl)
+    mapData.map = String(result)
+    mapData.map = parseMapToJSON(mapData.map, mapData)
+    return mapData
+  } catch (error) {
+    error.sourceMapData = mapData
+    throw error
+  }
 }
 
 function resolveSourceMapSync(code, codeUrl, read) {
@@ -309,15 +296,17 @@ function resolve(code, codeUrl, read, options, callback) {
         return callback(error)
       });
   } else {
-    resolveSourceMap(code, codeUrl, read, function(error, mapData) {
-      if (error) {
-        return callback(error)
-      }
-      if (!mapData) {
-        return callback(null, null)
-      }
-      _resolveSources(mapData)
-    })
+    resolveSourceMap(code, codeUrl, read)
+      .then(function(mapData) {
+        if (!mapData) {
+          callback(null, null)
+        } else {
+          return _resolveSources(mapData)
+        }
+      })
+      .catch(function(error) {
+        callback(error)
+      });
   }
 
   function _resolveSources(mapData) {

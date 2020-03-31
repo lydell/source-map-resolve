@@ -109,6 +109,8 @@ function testResolveSourceMap(method, sync) {
 
     if (sync) {
       method = asyncify(method)
+    } else {
+      method = asyncifyPromise(method)
     }
 
     var next = false
