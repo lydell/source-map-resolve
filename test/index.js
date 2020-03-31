@@ -9,6 +9,7 @@ var Throws       = common.Throws
 var identity     = common.identity
 var asyncify     = common.asyncify
 var makePromise  = common.makePromise
+var asyncifyPromise = common.asyncifyPromise
 
 var sourceMapResolve = require("../")
 
@@ -369,6 +370,8 @@ function testResolveSources(method, sync) {
 
     if (sync) {
       method = asyncify(method)
+    } else {
+      method = asyncifyPromise(method)
     }
 
     var next = false

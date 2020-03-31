@@ -191,47 +191,32 @@ function resolveSourceMapHelper(code, codeUrl) {
 
 
 
-function resolveSources(map, mapUrl, read, options, callback) {
-  if (typeof options === "function") {
-    callback = options
-    options = {}
-  }
-  var pending = map.sources ? map.sources.length : 0
+async function resolveSources(map, mapUrl, read, options) {
   var result = {
     sourcesResolved: [],
     sourcesContent:  []
   }
 
-  if (pending === 0) {
-    callbackAsync(callback, null, result)
-    return
-  }
-
-  var done = function() {
-    pending--
-    if (pending === 0) {
-      callback(null, result)
-    }
+  if (!map.sources || map.sources.length === 0) {
+    return result
   }
 
   for (let {fullUrl, sourceContent, index} of resolveSourcesHelper(map, mapUrl, options)) {
     result.sourcesResolved[index] = fullUrl
     if (typeof sourceContent === "string") {
       result.sourcesContent[index] = sourceContent
-      callbackAsync(done, null)
     } else {
       var readUrl = customDecodeUriComponent(fullUrl)
-      read(readUrl)
-        .then(function(source) {
-          result.sourcesContent[index] = String(source)
-          done()
-        })
-        .catch(function(error) {
-          result.sourcesContent[index] = error
-          done()
-        });
+      try {
+        const source = await read(readUrl)
+        result.sourcesContent[index] = String(source)
+      } catch (error) {
+        result.sourcesContent[index] = error
+      }
     }
   }
+
+  return result
 }
 
 function resolveSourcesSync(map, mapUrl, read, options) {
@@ -317,7 +302,7 @@ function resolve(code, codeUrl, read, options, callback) {
         } catch (error) {
           return callback(error)
         }
-        _resolveSources(data)
+        return _resolveSources(data)
       })
       .catch(function(error) {
         error.sourceMapData = data
@@ -336,14 +321,15 @@ function resolve(code, codeUrl, read, options, callback) {
   }
 
   function _resolveSources(mapData) {
-    resolveSources(mapData.map, mapData.sourcesRelativeTo, read, options, function(error, result) {
-      if (error) {
-        return callback(error)
-      }
-      mapData.sourcesResolved = result.sourcesResolved
-      mapData.sourcesContent  = result.sourcesContent
-      callback(null, mapData)
-    })
+    return resolveSources(mapData.map, mapData.sourcesRelativeTo, read, options)
+      .then(result => {
+        mapData.sourcesResolved = result.sourcesResolved
+        mapData.sourcesContent  = result.sourcesContent
+        callback(null, mapData)
+      })
+      .catch(error => {
+        callback(error)
+      })
   }
 }
 

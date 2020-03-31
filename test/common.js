@@ -44,6 +44,25 @@ function asyncify(syncFn) {
   }
 }
 
+function enqueue() {
+  return new Promise(function (resolve) {
+    setImmediate(function() { resolve() })
+  })
+}
+
+function asyncifyPromise(asyncFn) {
+  return async function(...args) {
+    var callback = args.pop()
+    await enqueue()
+    try {
+      let result = await asyncFn(...args)
+      callback(null, result)
+    } catch (error) {
+      callback(error)
+    }
+  }
+}
+
 function makePromise(syncFn) {
   return async function(...args) {
     return await syncFn(...args)
@@ -59,5 +78,6 @@ module.exports = {
   Throws:   Throws,
   identity: identity,
   asyncify: asyncify,
-  makePromise: makePromise
+  makePromise: makePromise,
+  asyncifyPromise: asyncifyPromise
 }
