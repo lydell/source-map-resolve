@@ -36,11 +36,17 @@ function asyncify(syncFn) {
     setImmediate(function() {
       try {
         result = syncFn.apply(this, args)
+        callback(null, result)
       } catch (error) {
-        return callback(error)
+        callback(error)
       }
-      callback(null, result)
     })
+  }
+}
+
+function makePromise(syncFn) {
+  return async function(...args) {
+    return await syncFn(...args)
   }
 }
 
@@ -52,5 +58,6 @@ module.exports = {
   read:     read,
   Throws:   Throws,
   identity: identity,
-  asyncify: asyncify
+  asyncify: asyncify,
+  makePromise: makePromise
 }

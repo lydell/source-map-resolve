@@ -7,6 +7,7 @@ var u3           = common.u3
 var read         = common.read
 var identity     = common.identity
 var asyncify     = common.asyncify
+var makePromise  = common.makePromise
 
 var sourceMapResolve = require("../")
 
@@ -15,7 +16,7 @@ path.sep = "\\"
 
 function testResolveSourceMap(method, sync) {
   return function(t) {
-    var wrap = (sync ? identity : asyncify)
+    var wrap = (sync ? identity : makePromise)
 
     var codeUrl = "c:\\a\\b\\c\\foo.js"
 
@@ -68,7 +69,7 @@ test(".resolveSourceMapSync", testResolveSourceMap(sourceMapResolve.resolveSourc
 
 function testResolveSources(method, sync) {
   return function(t) {
-    var wrap = (sync ? identity : asyncify)
+    var wrap = (sync ? identity : makePromise)
 
     var mapUrl = "c:\\a\\b\\c\\foo.js.map"
 
@@ -98,7 +99,7 @@ test(".resolveSourcesSync", testResolveSources(sourceMapResolve.resolveSourcesSy
 
 function testResolve(method, sync) {
   return function(t) {
-    var wrap = (sync ? identity : asyncify)
+    var wrap = (sync ? identity : makePromise)
     var wrapMap = function(mapFn, fn) {
       return wrap(function(url) {
         if (/\.map$/.test(url)) {
