@@ -8,6 +8,7 @@ var read         = common.read
 var Throws       = common.Throws
 var identity     = common.identity
 var asyncify     = common.asyncify
+var makePromise  = common.makePromise
 
 var sourceMapResolve = require("../")
 
@@ -97,7 +98,7 @@ var code = {
 
 function testResolveSourceMap(method, sync) {
   return function(t) {
-    var wrap = (sync ? identity : asyncify)
+    var wrap = (sync ? identity : makePromise)
 
     var codeUrl = "http://example.com/a/b/c/foo.js"
 
@@ -358,7 +359,7 @@ test(".resolveSourceMapSync", testResolveSourceMap(sourceMapResolve.resolveSourc
 
 function testResolveSources(method, sync) {
   return function(t) {
-    var wrap = (sync ? identity : asyncify)
+    var wrap = (sync ? identity : makePromise)
 
     var mapUrl = "http://example.com/a/b/c/foo.js.map"
 
@@ -615,7 +616,7 @@ test(".resolveSourcesSync no read", function(t) {
 
 function testResolve(method, sync) {
   return function(t) {
-    var wrap = (sync ? identity : asyncify)
+    var wrap = (sync ? identity : makePromise)
     var wrapMap = function(mapFn, fn) {
       return wrap(function(url) {
         if (/\.map$/.test(url)) {

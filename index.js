@@ -78,19 +78,20 @@ function resolveSourceMap(code, codeUrl, read, callback) {
     return callbackAsync(callback, null, mapData)
   }
   var readUrl = customDecodeUriComponent(mapData.url)
-  read(readUrl, function(error, result) {
-    if (error) {
+  read(readUrl)
+    .then(function(result) {
+      mapData.map = String(result)
+      try {
+        mapData.map = parseMapToJSON(mapData.map, mapData)
+        callback(null, mapData)
+      } catch (error) {
+        callback(error)
+      }
+    })
+    .catch(function(error) {
       error.sourceMapData = mapData
-      return callback(error)
-    }
-    mapData.map = String(result)
-    try {
-      mapData.map = parseMapToJSON(mapData.map, mapData)
-    } catch (error) {
-      return callback(error)
-    }
-    callback(null, mapData)
-  })
+      callback(error)
+    });
 }
 
 function resolveSourceMapSync(code, codeUrl, read) {
@@ -220,10 +221,15 @@ function resolveSources(map, mapUrl, read, options, callback) {
       callbackAsync(done, null)
     } else {
       var readUrl = customDecodeUriComponent(fullUrl)
-      read(readUrl, function(error, source) {
-        result.sourcesContent[index] = error ? error : String(source)
-        done()
-      })
+      read(readUrl)
+        .then(function(source) {
+          result.sourcesContent[index] = String(source)
+          done()
+        })
+        .catch(function(error) {
+          result.sourcesContent[index] = error
+          done()
+        });
     }
   }
 }
@@ -303,19 +309,20 @@ function resolve(code, codeUrl, read, options, callback) {
       map: null
     }
     var readUrl = customDecodeUriComponent(mapUrl)
-    read(readUrl, function(error, result) {
-      if (error) {
+    read(readUrl)
+      .then(function(result) {
+        data.map = String(result)
+        try {
+          data.map = parseMapToJSON(data.map, data)
+        } catch (error) {
+          return callback(error)
+        }
+        _resolveSources(data)
+      })
+      .catch(function(error) {
         error.sourceMapData = data
         return callback(error)
-      }
-      data.map = String(result)
-      try {
-        data.map = parseMapToJSON(data.map, data)
-      } catch (error) {
-        return callback(error)
-      }
-      _resolveSources(data)
-    })
+      });
   } else {
     resolveSourceMap(code, codeUrl, read, function(error, mapData) {
       if (error) {

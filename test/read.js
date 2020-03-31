@@ -2,6 +2,8 @@ var test         = require("tape")
 var common       = require("./common")
 var u1           = common.u1
 var asyncify     = common.asyncify
+var identity     = common.identity
+var makePromise  = common.makePromise
 
 var sourceMapResolve = require("../")
 
@@ -10,14 +12,10 @@ var codeUrl = "./built files/operators:+-<>%25.js"
 var sourceUrl = "../source files/operators:+-<>%25.coffee"
 
 function readTest(t, files) {
-  return function(file, callback) {
+  return function(file) {
     var fileData = files[file]
     t.ok(fileData, "decoded file name")
-    if (callback) {
-      callback(null, fileData)
-    } else {
-      return fileData
-    }
+    return fileData
   }
 }
 
@@ -25,6 +23,7 @@ function readTest(t, files) {
 
 function testResolveSourceMap(method, sync) {
   return function(t) {
+    var wrap = (sync ? identity : makePromise)
     t.plan(2)
 
     if (sync) {
@@ -35,7 +34,7 @@ function testResolveSourceMap(method, sync) {
       "built files/operators map.json": "{}"
     })
 
-    method(u1(mapUrl), codeUrl, read, function(error) {
+    method(u1(mapUrl), codeUrl, wrap(read), function(error) {
       t.error(error)
     })
 
@@ -49,6 +48,7 @@ test(".resolveSourceMapSync", testResolveSourceMap(sourceMapResolve.resolveSourc
 
 function testResolveSources(method, sync) {
   return function(t) {
+    var wrap = (sync ? identity : makePromise)
     t.plan(2)
 
     if (sync) {
@@ -62,7 +62,7 @@ function testResolveSources(method, sync) {
       "../source files/operators:+-<>%.coffee": "source code"
     })
 
-    method(map, mapUrl, read, function(error) {
+    method(map, mapUrl, wrap(read), function(error) {
       t.error(error)
     })
 
@@ -76,6 +76,7 @@ test(".resolveSourcesSync", testResolveSources(sourceMapResolve.resolveSourcesSy
 
 function testResolve(method, sync) {
   return function(t) {
+    var wrap = (sync ? identity : makePromise)
     t.plan(3)
 
     if (sync) {
@@ -90,7 +91,7 @@ function testResolve(method, sync) {
       "source files/operators:+-<>%.coffee": "source code"
     })
 
-    method(u1(mapUrl), codeUrl, read, function(error) {
+    method(u1(mapUrl), codeUrl, wrap(read), function(error) {
       t.error(error)
     })
 
