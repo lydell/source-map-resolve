@@ -4,6 +4,7 @@ var u1           = common.u1
 var asyncify     = common.asyncify
 var identity     = common.identity
 var makePromise  = common.makePromise
+var asyncifyPromise = common.asyncifyPromise
 
 var sourceMapResolve = require("../")
 
@@ -53,6 +54,8 @@ function testResolveSources(method, sync) {
 
     if (sync) {
       method = asyncify(method)
+    } else {
+      method = asyncifyPromise(method)
     }
 
     var map = {
