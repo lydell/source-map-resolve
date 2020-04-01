@@ -1,7 +1,6 @@
 var test         = require("tape")
 var common       = require("./common")
 var u1           = common.u1
-var asyncify     = common.asyncify
 var identity     = common.identity
 var makePromise  = common.makePromise
 var asyncifyPromise = common.asyncifyPromise
@@ -27,11 +26,7 @@ function testResolveSourceMap(method, sync) {
     var wrap = (sync ? identity : makePromise)
     t.plan(2)
 
-    if (sync) {
-      method = asyncify(method)
-    } else {
-      method = asyncifyPromise(method)
-    }
+    method = asyncifyPromise(method)
 
     var read = readTest(t, {
       "built files/operators map.json": "{}"
@@ -44,9 +39,9 @@ function testResolveSourceMap(method, sync) {
   }
 }
 
-test(".resolveSourceMap",     testResolveSourceMap(sourceMapResolve.resolveSourceMap,    false))
+test(".resolveSourceMap",     testResolveSourceMap(sourceMapResolve.resolveSourceMap, false))
 
-test(".resolveSourceMapSync", testResolveSourceMap(sourceMapResolve.resolveSourceMapSync, true))
+test(".resolveSourceMapSync", testResolveSourceMap(sourceMapResolve.resolveSourceMap, true))
 
 
 function testResolveSources(method, sync) {
@@ -54,11 +49,7 @@ function testResolveSources(method, sync) {
     var wrap = (sync ? identity : makePromise)
     t.plan(2)
 
-    if (sync) {
-      method = asyncify(method)
-    } else {
-      method = asyncifyPromise(method)
-    }
+    method = asyncifyPromise(method)
 
     var map = {
       sources: [sourceUrl]
@@ -74,9 +65,9 @@ function testResolveSources(method, sync) {
   }
 }
 
-test(".resolveSources",     testResolveSources(sourceMapResolve.resolveSources,    false))
+test(".resolveSources",     testResolveSources(sourceMapResolve.resolveSources, false))
 
-test(".resolveSourcesSync", testResolveSources(sourceMapResolve.resolveSourcesSync, true))
+test(".resolveSourcesSync", testResolveSources(sourceMapResolve.resolveSources, true))
 
 
 function testResolve(method, sync) {
@@ -84,11 +75,7 @@ function testResolve(method, sync) {
     var wrap = (sync ? identity : makePromise)
     t.plan(3)
 
-    if (sync) {
-      method = asyncify(method)
-    } else {
-      method = asyncifyPromise(method)
-    }
+    method = asyncifyPromise(method)
 
     var map = {
       sources: [sourceUrl]
@@ -105,6 +92,6 @@ function testResolve(method, sync) {
   }
 }
 
-test(".resolve",     testResolve(sourceMapResolve.resolve,    false))
+test(".resolve",     testResolve(sourceMapResolve.resolve, false))
 
-test(".resolveSync", testResolve(sourceMapResolve.resolveSync, true))
+test(".resolveSync", testResolve(sourceMapResolve.resolve, true))

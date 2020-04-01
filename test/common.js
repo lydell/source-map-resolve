@@ -28,22 +28,6 @@ function identity(x) {
   return x
 }
 
-function asyncify(syncFn) {
-  return function() {
-    var args = Array.prototype.slice.call(arguments)
-    var callback = args.pop()
-    var result
-    setImmediate(function() {
-      try {
-        result = syncFn.apply(this, args)
-        callback(null, result)
-      } catch (error) {
-        callback(error)
-      }
-    })
-  }
-}
-
 function enqueue() {
   return new Promise(function (resolve) {
     setImmediate(function() { resolve() })
@@ -77,7 +61,6 @@ module.exports = {
   read:     read,
   Throws:   Throws,
   identity: identity,
-  asyncify: asyncify,
   makePromise: makePromise,
   asyncifyPromise: asyncifyPromise
 }
