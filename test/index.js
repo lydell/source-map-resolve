@@ -7,7 +7,6 @@ var u4           = common.u4
 var read         = common.read
 var Throws       = common.Throws
 var identity     = common.identity
-var asyncify     = common.asyncify
 var makePromise  = common.makePromise
 var asyncifyPromise = common.asyncifyPromise
 
@@ -107,11 +106,7 @@ function testResolveSourceMap(method, sync) {
 
     t.equal(typeof method, "function", "is a function")
 
-    if (sync) {
-      method = asyncify(method)
-    } else {
-      method = asyncifyPromise(method)
-    }
+    method = asyncifyPromise(method)
 
     var next = false
     function isAsync() { t.ok(next, "is async") }
@@ -355,9 +350,9 @@ function testResolveSourceMap(method, sync) {
   }
 }
 
-test(".resolveSourceMap",     testResolveSourceMap(sourceMapResolve.resolveSourceMap,    false))
+test(".resolveSourceMap",     testResolveSourceMap(sourceMapResolve.resolveSourceMap, false))
 
-test(".resolveSourceMapSync", testResolveSourceMap(sourceMapResolve.resolveSourceMapSync, true))
+test(".resolveSourceMapSync", testResolveSourceMap(sourceMapResolve.resolveSourceMap, true))
 
 
 function testResolveSources(method, sync) {
@@ -370,11 +365,7 @@ function testResolveSources(method, sync) {
 
     t.equal(typeof method, "function", "is a function")
 
-    if (sync) {
-      method = asyncify(method)
-    } else {
-      method = asyncifyPromise(method)
-    }
+    method = asyncifyPromise(method)
 
     var next = false
     function isAsync() { t.ok(next, "is async") }
@@ -596,28 +587,9 @@ function testResolveSources(method, sync) {
   }
 }
 
-test(".resolveSources",     testResolveSources(sourceMapResolve.resolveSources,    false))
+test(".resolveSources",     testResolveSources(sourceMapResolve.resolveSources, false))
 
-test(".resolveSourcesSync", testResolveSources(sourceMapResolve.resolveSourcesSync, true))
-
-test(".resolveSourcesSync no read", function(t) {
-  t.plan(1)
-
-  var mapUrl = "http://example.com/a/b/c/foo.js.map"
-  var result = sourceMapResolve.resolveSourcesSync(map.mixed, mapUrl, null)
-
-  t.deepEqual(result, {
-    sourcesResolved: [
-      "http://example.com/a/b/c/foo.js",
-      "http://example.com/a/b/c/lib/bar.js",
-      "http://example.com/a/b/vendor/dom.js",
-      "http://example.com/version.js",
-      "http://foo.org/baz.js"
-    ],
-    sourcesContent: []
-  })
-})
-
+test(".resolveSourcesSync", testResolveSources(sourceMapResolve.resolveSources, true))
 
 function testResolve(method, sync) {
   return function(t) {
@@ -637,11 +609,7 @@ function testResolve(method, sync) {
 
     t.equal(typeof method, "function", "is a function")
 
-    if (sync) {
-      method = asyncify(method)
-    } else {
-      method = asyncifyPromise(method)
-    }
+    method = asyncifyPromise(method)
 
     var next = false
     function isAsync() { t.ok(next, "is async") }
@@ -1214,9 +1182,9 @@ function testResolve(method, sync) {
   }
 }
 
-test(".resolve",     testResolve(sourceMapResolve.resolve,    false))
+test(".resolve",     testResolve(sourceMapResolve.resolve, false))
 
-test(".resolveSync", testResolve(sourceMapResolve.resolveSync, true))
+test(".resolveSync", testResolve(sourceMapResolve.resolve, true))
 
 test(".parseMapToJSON", function(t) {
   t.plan(1)

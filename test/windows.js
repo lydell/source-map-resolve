@@ -6,7 +6,6 @@ var u2           = common.u2
 var u3           = common.u3
 var read         = common.read
 var identity     = common.identity
-var asyncify     = common.asyncify
 var makePromise  = common.makePromise
 var asyncifyPromise = common.asyncifyPromise
 
@@ -23,11 +22,7 @@ function testResolveSourceMap(method, sync) {
 
     t.plan(3 * 2)
 
-    if (sync) {
-      method = asyncify(method)
-    } else {
-      method = asyncifyPromise(method)
-    }
+    method = asyncifyPromise(method)
 
     var map = {}
     var readMap = wrap(read(JSON.stringify(map)))
@@ -65,9 +60,9 @@ function testResolveSourceMap(method, sync) {
   }
 }
 
-test(".resolveSourceMap",     testResolveSourceMap(sourceMapResolve.resolveSourceMap,    false))
+test(".resolveSourceMap",     testResolveSourceMap(sourceMapResolve.resolveSourceMap, false))
 
-test(".resolveSourceMapSync", testResolveSourceMap(sourceMapResolve.resolveSourceMapSync, true))
+test(".resolveSourceMapSync", testResolveSourceMap(sourceMapResolve.resolveSourceMap, true))
 
 
 function testResolveSources(method, sync) {
@@ -78,11 +73,7 @@ function testResolveSources(method, sync) {
 
     t.plan(1 * 3)
 
-    if (sync) {
-      method = asyncify(method)
-    } else {
-      method = asyncifyPromise(method)
-    }
+    method = asyncifyPromise(method)
 
     var map = {
       sources: ["foo.js", "/foo.js", "../foo.js"]
@@ -97,9 +88,9 @@ function testResolveSources(method, sync) {
   }
 }
 
-test(".resolveSources",     testResolveSources(sourceMapResolve.resolveSources,    false))
+test(".resolveSources",     testResolveSources(sourceMapResolve.resolveSources, false))
 
-test(".resolveSourcesSync", testResolveSources(sourceMapResolve.resolveSourcesSync, true))
+test(".resolveSourcesSync", testResolveSources(sourceMapResolve.resolveSources, true))
 
 
 function testResolve(method, sync) {
@@ -118,11 +109,7 @@ function testResolve(method, sync) {
 
     t.plan(3 * 2)
 
-    if (sync) {
-      method = asyncify(method)
-    } else {
-      method = asyncifyPromise(method)
-    }
+    method = asyncifyPromise(method)
 
     var map = {
       sources: ["foo.js", "/foo.js", "../foo.js"]
@@ -168,6 +155,6 @@ function testResolve(method, sync) {
   }
 }
 
-test(".resolve",     testResolve(sourceMapResolve.resolve,    false))
+test(".resolve",     testResolve(sourceMapResolve.resolve, false))
 
-test(".resolveSync", testResolve(sourceMapResolve.resolveSync, true))
+test(".resolveSync", testResolve(sourceMapResolve.resolve, true))
