@@ -41,6 +41,8 @@
     "beforeEach": false,
     "after": false,
     "afterEach": false,
+    "expect": false,
+    "fail": false,
     "define": false,
     "window": false,
     "atob": true,
