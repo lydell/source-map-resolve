@@ -23,7 +23,7 @@
   ],
   "scripts": {
     "lint": "jshint index.js test/",
-    "unit": "node test/index.js && node test/read.js && node test/windows.js",
+    "unit": "jest",
     "test": "npm run lint && npm run unit"
   },
   "dependencies": {
@@ -32,6 +32,10 @@
   },
   "devDependencies": {
     "jshint": "2.10.3",
-    "tape": "4.12.1"
+    "jest": "^25"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true
   }
 }
