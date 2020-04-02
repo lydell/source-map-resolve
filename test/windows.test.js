@@ -1,3 +1,5 @@
+'use strict'
+
 const path = require("path")
 const {u1, u2, u3, identity} = require("./common")
 const {

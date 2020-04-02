@@ -1,14 +1,14 @@
-var atob = require("atob")
-var urlLib = require("url")
-var pathLib = require("path")
-var decodeUriComponentLib = require("decode-uri-component")
+'use strict'
+
+const atob = require("atob")
+const urlLib = require("url")
+const pathLib = require("path")
+const decodeUriComponentLib = require("decode-uri-component")
 
 
 
-function resolveUrl(/* ...urls */) {
-  return Array.prototype.reduce.call(arguments, function(resolved, nextUrl) {
-    return urlLib.resolve(resolved, nextUrl)
-  })
+function resolveUrl(...urls) {
+  return urls.reduce((resolved, nextUrl) => urlLib.resolve(resolved, nextUrl))
 }
 
 function convertWindowsPath(aPath) {
@@ -30,9 +30,10 @@ function parseMapToJSON(string, data) {
 }
 
 
-var innerRegex = /[#@] sourceMappingURL=([^\s'"]*)/
+const innerRegex = /[#@] sourceMappingURL=([^\s'"]*)/
 
-var sourceMappingURLRegex = RegExp(
+/* eslint-disable prefer-template */
+const sourceMappingURLRegex = RegExp(
   "(?:" +
     "/\\*" +
     "(?:\\s*\r?\n(?://)?)?" +
@@ -44,21 +45,22 @@ var sourceMappingURLRegex = RegExp(
   ")" +
   "\\s*"
 )
+/* eslint-enable prefer-template */
 
 function getSourceMappingUrl(code) {
-  var match = code.match(sourceMappingURLRegex)
+  const match = code.match(sourceMappingURLRegex)
   return match ? match[1] || match[2] || "" : null
 }
 
 
 
 async function resolveSourceMap(code, codeUrl, read) {
-  var mapData = resolveSourceMapHelper(code, codeUrl)
+  const mapData = resolveSourceMapHelper(code, codeUrl)
 
   if (!mapData || mapData.map) {
     return mapData
   }
-  var readUrl = customDecodeUriComponent(mapData.url)
+  const readUrl = customDecodeUriComponent(mapData.url)
   try {
     const result = await read(readUrl)
     mapData.map = String(result)
@@ -70,7 +72,7 @@ async function resolveSourceMap(code, codeUrl, read) {
   }
 }
 
-var dataUriRegex = /^data:([^,;]*)(;[^,;]*)*(?:,(.*))?$/
+const dataUriRegex = /^data:([^,;]*)(;[^,;]*)*(?:,(.*))?$/
 
 /**
  * The media type for JSON text is application/json.
@@ -79,7 +81,7 @@ var dataUriRegex = /^data:([^,;]*)(;[^,;]*)*(?:,(.*))?$/
  *
  * `text/json` is non-standard media type
  */
-var jsonMimeTypeRegex = /^(?:application|text)\/json$/
+const jsonMimeTypeRegex = /^(?:application|text)\/json$/
 
 /**
  * JSON text exchanged between systems that are not part of a closed ecosystem
@@ -87,13 +89,13 @@ var jsonMimeTypeRegex = /^(?:application|text)\/json$/
  *
  * {@link https://tools.ietf.org/html/rfc8259#section-8.1 | Character Encoding}
  */
-var jsonCharacterEncoding = "utf-8"
+const jsonCharacterEncoding = "utf-8"
 
 function base64ToBuf(b64) {
-  var binStr = atob(b64)
-  var len = binStr.length
-  var arr = new Uint8Array(len)
-  for (var i = 0; i < len; i++) {
+  const binStr = atob(b64)
+  const len = binStr.length
+  const arr = new Uint8Array(len)
+  for (let i = 0; i < len; i++) {
     arr[i] = binStr.charCodeAt(i)
   }
   return arr
@@ -103,34 +105,34 @@ function decodeBase64String(b64) {
   if (typeof TextDecoder === "undefined" || typeof Uint8Array === "undefined") {
     return atob(b64)
   }
-  var buf = base64ToBuf(b64);
+  const buf = base64ToBuf(b64);
   // Note: `decoder.decode` method will throw a `DOMException` with the
   // `"EncodingError"` value when an coding error is found.
-  var decoder = new TextDecoder(jsonCharacterEncoding, {fatal: true})
+  const decoder = new TextDecoder(jsonCharacterEncoding, {fatal: true})
   return decoder.decode(buf);
 }
 
 function resolveSourceMapHelper(code, codeUrl) {
   codeUrl = convertWindowsPath(codeUrl)
 
-  var url = getSourceMappingUrl(code)
+  const url = getSourceMappingUrl(code)
   if (!url) {
     return null
   }
 
-  var dataUri = url.match(dataUriRegex)
+  const dataUri = url.match(dataUriRegex)
   if (dataUri) {
-    var mimeType = dataUri[1] || "text/plain"
-    var lastParameter = dataUri[2] || ""
-    var encoded = dataUri[3] || ""
-    var data = {
+    const mimeType = dataUri[1] || "text/plain"
+    const lastParameter = dataUri[2] || ""
+    const encoded = dataUri[3] || ""
+    const data = {
       sourceMappingURL: url,
       url: null,
       sourcesRelativeTo: codeUrl,
       map: encoded
     }
     if (!jsonMimeTypeRegex.test(mimeType)) {
-      var error = new Error("Unuseful data uri mime type: " + mimeType)
+      const error = new Error(`Unuseful data uri mime type: ${mimeType}`)
       error.sourceMapData = data
       throw error
     }
@@ -146,7 +148,7 @@ function resolveSourceMapHelper(code, codeUrl) {
     return data
   }
 
-  var mapUrl = resolveUrl(codeUrl, url)
+  const mapUrl = resolveUrl(codeUrl, url)
   return {
     sourceMappingURL: url,
     url: mapUrl,
@@ -158,7 +160,7 @@ function resolveSourceMapHelper(code, codeUrl) {
 
 
 async function resolveSources(map, mapUrl, read, options) {
-  var result = {
+  const result = {
     sourcesResolved: [],
     sourcesContent:  []
   }
@@ -167,12 +169,12 @@ async function resolveSources(map, mapUrl, read, options) {
     return result
   }
 
-  for (let {fullUrl, sourceContent, index} of resolveSourcesHelper(map, mapUrl, options)) {
+  for (const {fullUrl, sourceContent, index} of resolveSourcesHelper(map, mapUrl, options)) {
     result.sourcesResolved[index] = fullUrl
     if (typeof sourceContent === "string") {
       result.sourcesContent[index] = sourceContent
     } else {
-      var readUrl = customDecodeUriComponent(fullUrl)
+      const readUrl = customDecodeUriComponent(fullUrl)
       try {
         const source = await read(readUrl)
         result.sourcesContent[index] = String(source)
@@ -185,15 +187,15 @@ async function resolveSources(map, mapUrl, read, options) {
   return result
 }
 
-var endingSlash = /\/?$/
+const endingSlash = /\/?$/
 
 function* resolveSourcesHelper(map, mapUrl, options) {
   options = options || {}
   mapUrl = convertWindowsPath(mapUrl)
-  var fullUrl
-  var sourceContent
-  var sourceRoot
-  for (var index = 0, len = map.sources.length; index < len; index++) {
+  let fullUrl
+  let sourceContent
+  let sourceRoot
+  for (let index = 0, len = map.sources.length; index < len; index++) {
     sourceRoot = null
     if (typeof options.sourceRoot === "string") {
       sourceRoot = options.sourceRoot
@@ -219,14 +221,14 @@ function* resolveSourcesHelper(map, mapUrl, options) {
 
 async function resolve(code, codeUrl, read, options) {
   if (code === null) {
-    var mapUrl = codeUrl
-    var data = {
+    const mapUrl = codeUrl
+    const data = {
       sourceMappingURL: null,
       url: mapUrl,
       sourcesRelativeTo: mapUrl,
       map: null
     }
-    var readUrl = customDecodeUriComponent(mapUrl)
+    const readUrl = customDecodeUriComponent(mapUrl)
     try {
       const result = await read(readUrl)
       data.map = String(result)
@@ -253,8 +255,8 @@ async function resolve(code, codeUrl, read, options) {
 }
 
 module.exports = {
-  resolveSourceMap:     resolveSourceMap,
-  resolveSources:       resolveSources,
-  resolve:              resolve,
-  parseMapToJSON:       parseMapToJSON
+  resolveSourceMap,
+  resolveSources,
+  resolve,
+  parseMapToJSON,
 }

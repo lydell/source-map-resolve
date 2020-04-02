@@ -1,3 +1,5 @@
+'use strict'
+
 const {u1, u2, u3, u4, Throws, identity} = require("./common")
 
 const {
@@ -58,7 +60,7 @@ const map = {
   empty: {}
 }
 map.simpleString = JSON.stringify(map.simple)
-map.XSSIsafe = ")]}'" + map.simpleString
+map.XSSIsafe = `)]}'${map.simpleString}`
 
 const code = {
   fileRelative:       u1("foo.js.map"),

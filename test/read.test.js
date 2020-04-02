@@ -1,3 +1,5 @@
+'use strict'
+
 const {u1} = require("./common")
 const {
   resolveSourceMap,

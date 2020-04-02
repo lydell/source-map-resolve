@@ -22,7 +22,7 @@
     "index.js"
   ],
   "scripts": {
-    "lint": "jshint index.js test/",
+    "lint": "eslint index.js test/",
     "unit": "jest",
     "test": "npm run lint && npm run unit"
   },
@@ -31,7 +31,8 @@
     "decode-uri-component": "^0.2.0"
   },
   "devDependencies": {
-    "jshint": "2.10.3",
+    "eslint": "^6.8.0",
+    "eslint-plugin-jest": "^23.8.2",
     "jest": "^25"
   },
   "jest": {

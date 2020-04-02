@@ -1,3 +1,5 @@
+'use strict'
+
 function u1(url) {
   return `code\n/*# sourceMappingURL=${url} */`;
 }
