@@ -1,4 +1,4 @@
-Overview [![Build Status](https://travis-ci.org/lydell/source-map-resolve.svg?branch=master)](https://travis-ci.org/lydell/source-map-resolve)
+Overview
 ========
 
 Resolve the source map and/or sources for a generated file.
