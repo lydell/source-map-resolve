@@ -3,66 +3,53 @@
 Resolve the source map and/or sources for a generated file.
 
 ```js
-var sourceMapResolve = require("source-map-resolve");
-var sourceMap = require("source-map");
+const sourceMapResolve = require("source-map-resolve")
+const sourceMap = require("source-map")
 
-var code = ["!function(){...}();", "/*# sourceMappingURL=foo.js.map */"].join(
-  "\n"
-);
+const readFile = util.promisify(fs.readFile)
 
-sourceMapResolve.resolveSourceMap(code, "/js/foo.js", fs.readFile, function (
-  error,
-  result
-) {
-  if (error) {
-    return notifyFailure(error);
+const code = [
+  "!function(){...}();",
+  "/*# sourceMappingURL=foo.js.map */"
+].join("\n")
+
+(async () => {
+  try {
+    const result = await sourceMapResolve.resolveSourceMap(code, "/js/foo.js", readFile)
+    result
+    // {
+    //   map: {file: "foo.js", mappings: "...", sources: ["/coffee/foo.coffee"], names: []},
+    //   url: "/js/foo.js.map",
+    //   sourcesRelativeTo: "/js/foo.js.map",
+    //   sourceMappingURL: "foo.js.map"
+    // }
+
+    const result = await sourceMapResolve.resolveSources(result.map, result.sourcesRelativeTo, readFile)
+    result
+    // {
+    //   sourcesResolved: ["/coffee/foo.coffee"],
+    //   sourcesContent: ["<contents of /coffee/foo.coffee>"]
+    // }
+
+    const result = await sourceMapResolve.resolve(code, "/js/foo.js", readFile)
+    result
+    // {
+    //   map: {file: "foo.js", mappings: "...", sources: ["/coffee/foo.coffee"], names: []},
+    //   url: "/js/foo.js.map",
+    //   sourcesRelativeTo: "/js/foo.js.map",
+    //   sourceMappingURL: "foo.js.map",
+    //   sourcesResolved: ["/coffee/foo.coffee"],
+    //   sourcesContent: ["<contents of /coffee/foo.coffee>"]
+    // }
+
+    result.map.sourcesContent = result.sourcesContent
+    const map = new sourceMap.sourceMapConsumer(result.map)
+    map.sourceContentFor("/coffee/foo.coffee")
+    // "<contents of /coffee/foo.coffee>"
+  } catch (error) {
+    notifyFailure(error)
   }
-  result;
-  // {
-  //   map: {file: "foo.js", mappings: "...", sources: ["/coffee/foo.coffee"], names: []},
-  //   url: "/js/foo.js.map",
-  //   sourcesRelativeTo: "/js/foo.js.map",
-  //   sourceMappingURL: "foo.js.map"
-  // }
-
-  sourceMapResolve.resolveSources(
-    result.map,
-    result.sourcesRelativeTo,
-    fs.readFile,
-    function (error, result) {
-      if (error) {
-        return notifyFailure(error);
-      }
-      result;
-      // {
-      //   sourcesResolved: ["/coffee/foo.coffee"],
-      //   sourcesContent: ["<contents of /coffee/foo.coffee>"]
-      // }
-    }
-  );
-});
-
-sourceMapResolve.resolve(code, "/js/foo.js", fs.readFile, function (
-  error,
-  result
-) {
-  if (error) {
-    return notifyFailure(error);
-  }
-  result;
-  // {
-  //   map: {file: "foo.js", mappings: "...", sources: ["/coffee/foo.coffee"], names: []},
-  //   url: "/js/foo.js.map",
-  //   sourcesRelativeTo: "/js/foo.js.map",
-  //   sourceMappingURL: "foo.js.map",
-  //   sourcesResolved: ["/coffee/foo.coffee"],
-  //   sourcesContent: ["<contents of /coffee/foo.coffee>"]
-  // }
-  result.map.sourcesContent = result.sourcesContent;
-  var map = new sourceMap.sourceMapConsumer(result.map);
-  map.sourceContentFor("/coffee/foo.coffee");
-  // "<contents of /coffee/foo.coffee>"
-});
+}())
 ```
 
 # Installation
@@ -145,22 +132,6 @@ header (see the [Notes] section). In this case, the `sourceMappingURL` property
 of the result is `null`.
 
 [notes]: #notes
-
-### `sourceMapResolve.*Sync()`
-
-There are also sync versions of the three previous functions. They are identical
-to the async versions, except:
-
-- They expect a sync reading function. In Node.js you might want to use
-  `fs.readFileSync`, while in the browser you might want to use a synchronus
-  `XMLHttpRequest`.
-- They throw errors and return the result instead of using a callback.
-
-`sourceMapResolve.resolveSourcesSync` also accepts `null` as the `read`
-parameter. The result is the same as when passing a function as the `read parameter`, except that the `sourcesContent` property of the result will be an
-empty array. In other words, the sources aren’t read. You only get the
-`sourcesResolved` property. (This only supported in the synchronus version, since
-there is no point doing it asynchronusly.)
 
 ### `sourceMapResolve.parseMapToJSON(string, [data])`
 
