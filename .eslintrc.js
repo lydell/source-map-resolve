@@ -7,8 +7,8 @@ module.exports = {
     node: true,
     "jest/globals": true,
   },
-  "parserOptions": {
-    "ecmaVersion": 2018
+  parserOptions: {
+    ecmaVersion: 2018,
   },
   rules: {
     "arrow-body-style": "error",
@@ -19,16 +19,19 @@ module.exports = {
     "object-shorthand": "error",
     "one-var": ["error", "never"],
     "prefer-arrow-callback": "error",
-    "prefer-destructuring": ["error", {
-      "VariableDeclarator": {
-        "array": false,
-        "object": true,
+    "prefer-destructuring": [
+      "error",
+      {
+        VariableDeclarator: {
+          array: false,
+          object: true,
+        },
+        AssignmentExpression: {
+          array: false,
+          object: false,
+        },
       },
-      "AssignmentExpression": {
-        "array": false,
-        "object": false,
-      }
-    }],
+    ],
     "prefer-rest-params": "error",
     "prefer-spread": "error",
     "prefer-template": "error",

@@ -1,78 +1,79 @@
-'use strict'
+"use strict";
 
-const atob = require("atob")
-const urlLib = require("url")
-const pathLib = require("path")
-const decodeUriComponentLib = require("decode-uri-component")
-
-
+const atob = require("atob");
+const urlLib = require("url");
+const pathLib = require("path");
+const decodeUriComponentLib = require("decode-uri-component");
 
 function resolveUrl(...urls) {
-  return urls.reduce((resolved, nextUrl) => urlLib.resolve(resolved, nextUrl))
+  return urls.reduce((resolved, nextUrl) => urlLib.resolve(resolved, nextUrl));
 }
 
 function convertWindowsPath(aPath) {
-  return pathLib.sep === "\\" ? aPath.replace(/\\/g, "/").replace(/^[a-z]:\/?/i, "/") : aPath
+  return pathLib.sep === "\\"
+    ? aPath.replace(/\\/g, "/").replace(/^[a-z]:\/?/i, "/")
+    : aPath;
 }
 
 function customDecodeUriComponent(string) {
   // `decodeUriComponentLib` turns `+` into ` `, but that's not wanted.
-  return decodeUriComponentLib(string.replace(/\+/g, "%2B"))
+  return decodeUriComponentLib(string.replace(/\+/g, "%2B"));
 }
 
 function parseMapToJSON(string, data) {
   try {
-    return JSON.parse(string.replace(/^\)\]\}'/, ""))
+    return JSON.parse(string.replace(/^\)\]\}'/, ""));
   } catch (error) {
-    error.sourceMapData = data
-    throw error
+    error.sourceMapData = data;
+    throw error;
   }
 }
 
-
-const innerRegex = /[#@] sourceMappingURL=([^\s'"]*)/
+const innerRegex = /[#@] sourceMappingURL=([^\s'"]*)/;
 
 /* eslint-disable prefer-template */
 const sourceMappingURLRegex = RegExp(
   "(?:" +
     "/\\*" +
     "(?:\\s*\r?\n(?://)?)?" +
-    "(?:" + innerRegex.source + ")" +
+    "(?:" +
+    innerRegex.source +
+    ")" +
     "\\s*" +
     "\\*/" +
     "|" +
-    "//(?:" + innerRegex.source + ")" +
-  ")" +
-  "\\s*"
-)
+    "//(?:" +
+    innerRegex.source +
+    ")" +
+    ")" +
+    "\\s*"
+);
 /* eslint-enable prefer-template */
 
 function getSourceMappingUrl(code) {
-  const match = code.match(sourceMappingURLRegex)
-  return match ? match[1] || match[2] || "" : null
+  const match = code.match(sourceMappingURLRegex);
+  return match ? match[1] || match[2] || "" : null;
 }
-
-
 
 async function resolveSourceMap(code, codeUrl, read) {
-  const mapData = resolveSourceMapHelper(code, codeUrl)
+  const mapData = resolveSourceMapHelper(code, codeUrl);
 
   if (!mapData || mapData.map) {
-    return mapData
+    return mapData;
   }
-  const readUrl = customDecodeUriComponent(mapData.url)
+  const readUrl = customDecodeUriComponent(mapData.url);
   try {
-    const result = await read(readUrl)
-    mapData.map = String(result)
-    mapData.map = parseMapToJSON(mapData.map, mapData)
-    return mapData
+    const result = await read(readUrl);
+    mapData.map = String(result);
+    mapData.map = parseMapToJSON(mapData.map, mapData);
+    return mapData;
   } catch (error) {
-    error.sourceMapData = mapData
-    throw error
+    error.sourceMapData = mapData;
+    throw error;
   }
 }
 
-const dataUriRegex = /^data:([^,;]*)(;[^,;]*)*(?:,(.*))?$/
+const dataUriRegex = /^data:([^,;]*)(;[^,;]*)*(?:,(.*))?$/;
 
 /**
  * The media type for JSON text is application/json.
@@ -81,7 +82,7 @@ const dataUriRegex = /^data:([^,;]*)(;[^,;]*)*(?:,(.*))?$/
  *
  * `text/json` is non-standard media type
  */
-const jsonMimeTypeRegex = /^(?:application|text)\/json$/
+const jsonMimeTypeRegex = /^(?:application|text)\/json$/;
 
 /**
  * JSON text exchanged between systems that are not part of a closed ecosystem
@@ -89,168 +90,182 @@ const jsonMimeTypeRegex = /^(?:application|text)\/json$/
  *
  * {@link https://tools.ietf.org/html/rfc8259#section-8.1 | Character Encoding}
  */
-const jsonCharacterEncoding = "utf-8"
+const jsonCharacterEncoding = "utf-8";
 
 function base64ToBuf(b64) {
-  const binStr = atob(b64)
-  const len = binStr.length
-  const arr = new Uint8Array(len)
+  const binStr = atob(b64);
+  const len = binStr.length;
+  const arr = new Uint8Array(len);
   for (let i = 0; i < len; i++) {
-    arr[i] = binStr.charCodeAt(i)
+    arr[i] = binStr.charCodeAt(i);
   }
-  return arr
+  return arr;
 }
 
 function decodeBase64String(b64) {
   if (typeof TextDecoder === "undefined" || typeof Uint8Array === "undefined") {
-    return atob(b64)
+    return atob(b64);
   }
   const buf = base64ToBuf(b64);
   // Note: `decoder.decode` method will throw a `DOMException` with the
   // `"EncodingError"` value when an coding error is found.
-  const decoder = new TextDecoder(jsonCharacterEncoding, {fatal: true})
+  const decoder = new TextDecoder(jsonCharacterEncoding, { fatal: true });
   return decoder.decode(buf);
 }
 
 function resolveSourceMapHelper(code, codeUrl) {
-  codeUrl = convertWindowsPath(codeUrl)
+  codeUrl = convertWindowsPath(codeUrl);
 
-  const url = getSourceMappingUrl(code)
+  const url = getSourceMappingUrl(code);
   if (!url) {
-    return null
+    return null;
   }
 
-  const dataUri = url.match(dataUriRegex)
+  const dataUri = url.match(dataUriRegex);
   if (dataUri) {
-    const mimeType = dataUri[1] || "text/plain"
-    const lastParameter = dataUri[2] || ""
-    const encoded = dataUri[3] || ""
+    const mimeType = dataUri[1] || "text/plain";
+    const lastParameter = dataUri[2] || "";
+    const encoded = dataUri[3] || "";
     const data = {
       sourceMappingURL: url,
       url: null,
       sourcesRelativeTo: codeUrl,
-      map: encoded
-    }
+      map: encoded,
+    };
     if (!jsonMimeTypeRegex.test(mimeType)) {
-      const error = new Error(`Unuseful data uri mime type: ${mimeType}`)
-      error.sourceMapData = data
-      throw error
+      const error = new Error(`Unuseful data uri mime type: ${mimeType}`);
+      error.sourceMapData = data;
+      throw error;
     }
     try {
       data.map = parseMapToJSON(
-        lastParameter === ";base64" ? decodeBase64String(encoded) : decodeURIComponent(encoded),
+        lastParameter === ";base64"
+          ? decodeBase64String(encoded)
+          : decodeURIComponent(encoded),
         data
-      )
+      );
     } catch (error) {
-      error.sourceMapData = data
-      throw error
+      error.sourceMapData = data;
+      throw error;
     }
-    return data
+    return data;
   }
 
-  const mapUrl = resolveUrl(codeUrl, url)
+  const mapUrl = resolveUrl(codeUrl, url);
   return {
     sourceMappingURL: url,
     url: mapUrl,
     sourcesRelativeTo: mapUrl,
-    map: null
-  }
+    map: null,
+  };
 }
-
-
 
 async function resolveSources(map, mapUrl, read, options) {
   const result = {
     sourcesResolved: [],
-    sourcesContent:  []
-  }
+    sourcesContent: [],
+  };
 
   if (!map.sources || map.sources.length === 0) {
-    return result
+    return result;
   }
 
-  for (const {fullUrl, sourceContent, index} of resolveSourcesHelper(map, mapUrl, options)) {
-    result.sourcesResolved[index] = fullUrl
+  for (const { fullUrl, sourceContent, index } of resolveSourcesHelper(
+    map,
+    mapUrl,
+    options
+  )) {
+    result.sourcesResolved[index] = fullUrl;
     if (typeof sourceContent === "string") {
-      result.sourcesContent[index] = sourceContent
+      result.sourcesContent[index] = sourceContent;
     } else {
-      const readUrl = customDecodeUriComponent(fullUrl)
+      const readUrl = customDecodeUriComponent(fullUrl);
       try {
-        const source = await read(readUrl)
-        result.sourcesContent[index] = String(source)
+        const source = await read(readUrl);
+        result.sourcesContent[index] = String(source);
       } catch (error) {
-        result.sourcesContent[index] = error
+        result.sourcesContent[index] = error;
       }
     }
   }
 
-  return result
+  return result;
 }
 
-const endingSlash = /\/?$/
+const endingSlash = /\/?$/;
 
 function* resolveSourcesHelper(map, mapUrl, options) {
-  options = options || {}
-  mapUrl = convertWindowsPath(mapUrl)
-  let fullUrl
-  let sourceContent
-  let sourceRoot
+  options = options || {};
+  mapUrl = convertWindowsPath(mapUrl);
+  let fullUrl;
+  let sourceContent;
+  let sourceRoot;
   for (let index = 0, len = map.sources.length; index < len; index++) {
-    sourceRoot = null
+    sourceRoot = null;
     if (typeof options.sourceRoot === "string") {
-      sourceRoot = options.sourceRoot
-    } else if (typeof map.sourceRoot === "string" && options.sourceRoot !== false) {
-      sourceRoot = map.sourceRoot
+      sourceRoot = options.sourceRoot;
+    } else if (
+      typeof map.sourceRoot === "string" &&
+      options.sourceRoot !== false
+    ) {
+      sourceRoot = map.sourceRoot;
     }
     // If the sourceRoot is the empty string, it is equivalent to not setting
     // the property at all.
-    if (sourceRoot === null || sourceRoot === '') {
-      fullUrl = resolveUrl(mapUrl, map.sources[index])
+    if (sourceRoot === null || sourceRoot === "") {
+      fullUrl = resolveUrl(mapUrl, map.sources[index]);
     } else {
       // Make sure that the sourceRoot ends with a slash, so that `/scripts/subdir` becomes
       // `/scripts/subdir/<source>`, not `/scripts/<source>`. Pointing to a file as source root
       // does not make sense.
-      fullUrl = resolveUrl(mapUrl, sourceRoot.replace(endingSlash, "/"), map.sources[index])
+      fullUrl = resolveUrl(
+        mapUrl,
+        sourceRoot.replace(endingSlash, "/"),
+        map.sources[index]
+      );
     }
-    sourceContent = (map.sourcesContent || [])[index]
-    yield {fullUrl, sourceContent, index}
+    sourceContent = (map.sourcesContent || [])[index];
+    yield { fullUrl, sourceContent, index };
   }
 }
 
-
-
 async function resolve(code, codeUrl, read, options) {
   if (code === null) {
-    const mapUrl = codeUrl
+    const mapUrl = codeUrl;
     const data = {
       sourceMappingURL: null,
       url: mapUrl,
       sourcesRelativeTo: mapUrl,
-      map: null
-    }
-    const readUrl = customDecodeUriComponent(mapUrl)
+      map: null,
+    };
+    const readUrl = customDecodeUriComponent(mapUrl);
     try {
-      const result = await read(readUrl)
-      data.map = String(result)
-      data.map = parseMapToJSON(data.map, data)
-      return await _resolveSources(data)
+      const result = await read(readUrl);
+      data.map = String(result);
+      data.map = parseMapToJSON(data.map, data);
+      return await _resolveSources(data);
     } catch (error) {
-      error.sourceMapData = data
-      throw error
+      error.sourceMapData = data;
+      throw error;
     }
   } else {
-    const mapData = await resolveSourceMap(code, codeUrl, read)
+    const mapData = await resolveSourceMap(code, codeUrl, read);
     if (!mapData) {
-      return null
+      return null;
     }
-    return await _resolveSources(mapData)
+    return await _resolveSources(mapData);
   }
 
   async function _resolveSources(mapData) {
-    const result = await resolveSources(mapData.map, mapData.sourcesRelativeTo, read, options)
-    mapData.sourcesResolved = result.sourcesResolved
-    mapData.sourcesContent  = result.sourcesContent
-    return mapData
+    const result = await resolveSources(
+      mapData.map,
+      mapData.sourcesRelativeTo,
+      read,
+      options
+    );
+    mapData.sourcesResolved = result.sourcesResolved;
+    mapData.sourcesContent = result.sourcesContent;
+    return mapData;
   }
 }
 
@@ -259,4 +274,4 @@ module.exports = {
   resolveSources,
   resolve,
   parseMapToJSON,
-}
+};

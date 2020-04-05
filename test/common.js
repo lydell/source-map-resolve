@@ -1,4 +1,4 @@
-'use strict'
+"use strict";
 
 function u1(url) {
   return `code\n/*# sourceMappingURL=${url} */`;
@@ -17,11 +17,11 @@ function u4(url) {
 }
 
 function Throws(x) {
-  throw new Error(x)
+  throw new Error(x);
 }
 
 function identity(x) {
-  return x
+  return x;
 }
 
 module.exports = {
@@ -31,4 +31,4 @@ module.exports = {
   u4,
   Throws,
   identity,
-}
+};
