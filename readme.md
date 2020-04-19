@@ -1,71 +1,64 @@
-Overview
-========
+# Overview
 
 Resolve the source map and/or sources for a generated file.
 
 ```js
-var sourceMapResolve = require("source-map-resolve")
-var sourceMap        = require("source-map")
+const sourceMapResolve = require("source-map-resolve")
+const sourceMap = require("source-map")
 
-var code = [
+const readFile = util.promisify(fs.readFile)
+
+const code = [
   "!function(){...}();",
   "/*# sourceMappingURL=foo.js.map */"
 ].join("\n")
 
-sourceMapResolve.resolveSourceMap(code, "/js/foo.js", fs.readFile, function(error, result) {
-  if (error) {
-    return notifyFailure(error)
-  }
-  result
-  // {
-  //   map: {file: "foo.js", mappings: "...", sources: ["/coffee/foo.coffee"], names: []},
-  //   url: "/js/foo.js.map",
-  //   sourcesRelativeTo: "/js/foo.js.map",
-  //   sourceMappingURL: "foo.js.map"
-  // }
+(async () => {
+  try {
+    const result = await sourceMapResolve.resolveSourceMap(code, "/js/foo.js", readFile)
+    result
+    // {
+    //   map: {file: "foo.js", mappings: "...", sources: ["/coffee/foo.coffee"], names: []},
+    //   url: "/js/foo.js.map",
+    //   sourcesRelativeTo: "/js/foo.js.map",
+    //   sourceMappingURL: "foo.js.map"
+    // }
 
-  sourceMapResolve.resolveSources(result.map, result.sourcesRelativeTo, fs.readFile, function(error, result) {
-    if (error) {
-      return notifyFailure(error)
-    }
+    const result = await sourceMapResolve.resolveSources(result.map, result.sourcesRelativeTo, readFile)
     result
     // {
     //   sourcesResolved: ["/coffee/foo.coffee"],
     //   sourcesContent: ["<contents of /coffee/foo.coffee>"]
     // }
-  })
-})
 
-sourceMapResolve.resolve(code, "/js/foo.js", fs.readFile, function(error, result) {
-  if (error) {
-    return notifyFailure(error)
+    const result = await sourceMapResolve.resolve(code, "/js/foo.js", readFile)
+    result
+    // {
+    //   map: {file: "foo.js", mappings: "...", sources: ["/coffee/foo.coffee"], names: []},
+    //   url: "/js/foo.js.map",
+    //   sourcesRelativeTo: "/js/foo.js.map",
+    //   sourceMappingURL: "foo.js.map",
+    //   sourcesResolved: ["/coffee/foo.coffee"],
+    //   sourcesContent: ["<contents of /coffee/foo.coffee>"]
+    // }
+
+    result.map.sourcesContent = result.sourcesContent
+    const map = new sourceMap.sourceMapConsumer(result.map)
+    map.sourceContentFor("/coffee/foo.coffee")
+    // "<contents of /coffee/foo.coffee>"
+  } catch (error) {
+    notifyFailure(error)
   }
-  result
-  // {
-  //   map: {file: "foo.js", mappings: "...", sources: ["/coffee/foo.coffee"], names: []},
-  //   url: "/js/foo.js.map",
-  //   sourcesRelativeTo: "/js/foo.js.map",
-  //   sourceMappingURL: "foo.js.map",
-  //   sourcesResolved: ["/coffee/foo.coffee"],
-  //   sourcesContent: ["<contents of /coffee/foo.coffee>"]
-  // }
-  result.map.sourcesContent = result.sourcesContent
-  var map = new sourceMap.sourceMapConsumer(result.map)
-  map.sourceContentFor("/coffee/foo.coffee")
-  // "<contents of /coffee/foo.coffee>"
-})
+}())
 ```
 
-
-Installation
-============
+# Installation
 
 `npm install source-map-resolve`
 
-Usage
-=====
+# Usage
 
-### `sourceMapResolve.resolveSourceMap(code, codeUrl, read, callback)` ###
+### `sourceMapResolve.resolveSourceMap(code, codeUrl, read, callback)`
 
 - `code` is a string of code that may or may not contain a sourceMappingURL
   comment. Such a comment is used to resolve the source map.
@@ -95,7 +88,7 @@ The result is an object with the following properties:
 
 If `code` contains no sourceMappingURL, the result is `null`.
 
-### `sourceMapResolve.resolveSources(map, mapUrl, read, [options], callback)` ###
+### `sourceMapResolve.resolveSources(map, mapUrl, read, [options], callback)`
 
 - `map` is a source map, as an object (not a string).
 - `mapUrl` is the url to the file containing `map`. Relative sources in the
@@ -120,7 +113,7 @@ The result is an object with the following properties:
   in the same order as `map.sources`. If getting the contents of a source fails,
   an error object is put into the array instead.
 
-### `sourceMapResolve.resolve(code, codeUrl, read, [options], callback)` ###
+### `sourceMapResolve.resolve(code, codeUrl, read, [options], callback)`
 
 The arguments are identical to `sourceMapResolve.resolveSourceMap`, except that
 you may also provide the same `options` as in `sourceMapResolve.resolveSources`.
@@ -138,27 +131,9 @@ is handy if you _sometimes_ get the source map url from the `SourceMap: <url>`
 header (see the [Notes] section). In this case, the `sourceMappingURL` property
 of the result is `null`.
 
+[notes]: #notes
 
-[Notes]: #notes
-
-### `sourceMapResolve.*Sync()` ###
-
-There are also sync versions of the three previous functions. They are identical
-to the async versions, except:
-
-- They expect a sync reading function. In Node.js you might want to use
-  `fs.readFileSync`, while in the browser you might want to use a synchronus
-  `XMLHttpRequest`.
-- They throw errors and return the result instead of using a callback.
-
-`sourceMapResolve.resolveSourcesSync` also accepts `null` as the `read`
-parameter. The result is the same as when passing a function as the `read
-parameter`, except that the `sourcesContent` property of the result will be an
-empty array. In other words, the sources aren’t read. You only get the
-`sourcesResolved` property. (This only supported in the synchronus version, since
-there is no point doing it asynchronusly.)
-
-### `sourceMapResolve.parseMapToJSON(string, [data])` ###
+### `sourceMapResolve.parseMapToJSON(string, [data])`
 
 The spec says that if a source map (as a string) starts with `)]}'`, it should
 be stripped off. This is to prevent XSSI attacks. This function does that and
@@ -175,9 +150,7 @@ up until the error occurred.
 Note that while the `map` property of result objects always is an object,
 `error.sourceMapData.map` will be a string if parsing that string fails.
 
-
-Note
-====
+# Note
 
 This module resolves the source map for a given generated file by looking for a
 sourceMappingURL comment. The spec defines yet a way to provide the URL to the
@@ -186,8 +159,6 @@ file. Since this module doesn’t retrive the generated code for you (instead
 _you_ give the generated code to the module), it’s up to you to look for such a
 header when you retrieve the file (should the need arise).
 
-
-License
-=======
+# License
 
 [MIT](LICENSE).

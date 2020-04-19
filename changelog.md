@@ -1,10 +1,10 @@
-### Version 0.6.0 (2020-03-21) ###
+### Version 0.6.0 (2020-03-21)
 
 - Removed: The browser version. Only Node.js is now supported.
 - Improved: Three old, weird, tiny dependencies were inlined, which should
   decrease install size.
 
-### Version 0.5.3 (2019-12-28) ###
+### Version 0.5.3 (2019-12-28)
 
 - Fixed: base64 encoded source maps now correctly decodes as utf-8. Previously,
   non-ASCII characters could end up garbled. Thanks to ZHAO Jinxiang
@@ -12,13 +12,13 @@
   supporting both `TextDecoder` and `Uint8Array`.)
 - Improved: Reduced size of the npm package.
 
-### Version 0.5.2 (2018-05-10) ###
+### Version 0.5.2 (2018-05-10)
 
 - Improved: Updated the version range of `atob` to disallow depending on `2.0.3`
   which as a [security
   vulnerability](https://snyk.io/test/npm/atob/2.0.3?severity=high&severity=medium&severity=low).
 
-### Version 0.5.1 (2017-10-21) ###
+### Version 0.5.1 (2017-10-21)
 
 - Fixed: URLs are now decoded before being passed to `read` in Node.js. This
   allows reading files with spaces, for example.
@@ -31,7 +31,7 @@
   sourcesContent: []
   ```
 
-### Version 0.5.0 (2016-02-28) ###
+### Version 0.5.0 (2016-02-28)
 
 - Improved: Errors now have a `sourceMapData` property that contain as much as
   possible of the intended result of the function up until the error occurred.
@@ -41,7 +41,7 @@
   objects for all failed sources, and strings otherwise. (Backwards-incompatible
   change.)
 
-### Version 0.4.0 (2015-08-29) ###
+### Version 0.4.0 (2015-08-29)
 
 - Removed: The `ignoreSourceRoot` option of `resolveSources`. It has been
   replaced with `sourceRoot: false`. (Backwards-incompatible change.)
@@ -52,12 +52,11 @@
   addition to the existing signature, which will read `mapUrl` instead of
   looking for a sourceMappingURL in the code.
 
-### Version 0.3.1 (2014-08-16) ###
+### Version 0.3.1 (2014-08-16)
 
 - Improved: Updated the source-map-url dependency to 0.3.0.
 
-
-### Version 0.3.0 (2014-07-02) ###
+### Version 0.3.0 (2014-07-02)
 
 - Removed: Argument checking. It’s not worth it. (Possibly
   backwards-incompatible change.)
@@ -66,8 +65,7 @@
 - Added: It is now possible to resolve only the URLs of sources, without
   reading them.
 
-
-### Version 0.2.0 (2014-06-22) ###
+### Version 0.2.0 (2014-06-22)
 
 - Changed: The result of `resolveSources` is now an object, not an array. The
   old result array is available in the `sourcesContent` property.
@@ -79,27 +77,23 @@
 - Added: The result object of `resolve` now contains the `sourcesResolved`
   property from `resolveSources`.
 
-
-### Version 0.1.4 (2014-06-16) ###
+### Version 0.1.4 (2014-06-16)
 
 - Fixed: `sourcesContent` was mis-typed as `sourceContents`, which meant that
   the `sourcesContent` property of source maps never was used when resolving
   sources.
 
-
-### Version 0.1.3 (2014-05-06) ###
+### Version 0.1.3 (2014-05-06)
 
 - Only documentation and meta-data changes.
 
-
-### Version 0.1.2 (2014-03-23) ###
+### Version 0.1.2 (2014-03-23)
 
 - Improved: Source maps starting with `)]}'` are now parsed correctly. The spec
   allows source maps to start with that character sequence to prevent XSSI
   attacks.
 
-
-### Version 0.1.1 (2014-03-06) ###
+### Version 0.1.1 (2014-03-06)
 
 - Improved: Make sourceRoot resolving more sensible.
 
@@ -107,8 +101,6 @@
   — that is, as a directory called “subdir”, not a file called “subdir”.
   Pointing to a file as source root does not makes sense.
 
-
-
-### Version 0.1.0 (2014-03-03) ###
+### Version 0.1.0 (2014-03-03)
 
 - Initial release.

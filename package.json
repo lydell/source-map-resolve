@@ -22,16 +22,22 @@
     "index.js"
   ],
   "scripts": {
-    "lint": "jshint index.js test/",
-    "unit": "node test/index.js && node test/read.js && node test/windows.js",
-    "test": "npm run lint && npm run unit"
+    "eslint": "eslint . --fix",
+    "prettier": "prettier --write .",
+    "test": "eslint . && prettier --check . && jest"
   },
   "dependencies": {
     "atob": "^2.1.2",
     "decode-uri-component": "^0.2.0"
   },
   "devDependencies": {
-    "jshint": "2.10.3",
-    "tape": "4.12.1"
+    "eslint": "^6.8.0",
+    "eslint-plugin-jest": "^23.8.2",
+    "jest": "^25",
+    "prettier": "2.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true
   }
 }
