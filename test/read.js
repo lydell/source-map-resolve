@@ -1,18 +1,18 @@
-var test         = require("tape")
-var common       = require("./common")
-var u1           = common.u1
-var asyncify     = common.asyncify
+import test from 'tape'
+import common from './common.js'
+import sourceMapResolve from '../index.js'
 
-var sourceMapResolve = require("../")
+const u1 = common.u1
+const asyncify = common.asyncify
 
-var mapUrl = "operators%20map.json"
-var codeUrl = "./built files/operators:+-<>%25.js"
-var sourceUrl = "../source files/operators:+-<>%25.coffee"
+const mapUrl = 'operators%20map.json'
+const codeUrl = './built files/operators:+-<>%25.js'
+const sourceUrl = '../source files/operators:+-<>%25.coffee'
 
-function readTest(t, files) {
-  return function(file, callback) {
-    var fileData = files[file]
-    t.ok(fileData, "decoded file name")
+function readTest (t, files) {
+  return (file, callback) => {
+    const fileData = files[file]
+    t.ok(fileData, 'decoded file name')
     if (callback) {
       callback(null, fileData)
     } else {
@@ -21,82 +21,75 @@ function readTest(t, files) {
   }
 }
 
-
-
-function testResolveSourceMap(method, sync) {
-  return function(t) {
+function testResolveSourceMap (method, sync) {
+  return t => {
     t.plan(2)
 
     if (sync) {
       method = asyncify(method)
     }
 
-    var read = readTest(t, {
-      "built files/operators map.json": "{}"
+    const read = readTest(t, {
+      'built files/operators map.json': '{}'
     })
 
-    method(u1(mapUrl), codeUrl, read, function(error) {
+    method(u1(mapUrl), codeUrl, read, error => {
       t.error(error)
     })
-
   }
 }
 
-test(".resolveSourceMap",     testResolveSourceMap(sourceMapResolve.resolveSourceMap,    false))
+test('.resolveSourceMap', testResolveSourceMap(sourceMapResolve.resolveSourceMap, false))
 
-test(".resolveSourceMapSync", testResolveSourceMap(sourceMapResolve.resolveSourceMapSync, true))
+test('.resolveSourceMapSync', testResolveSourceMap(sourceMapResolve.resolveSourceMapSync, true))
 
-
-function testResolveSources(method, sync) {
-  return function(t) {
+function testResolveSources (method, sync) {
+  return t => {
     t.plan(2)
 
     if (sync) {
       method = asyncify(method)
     }
 
-    var map = {
+    const map = {
       sources: [sourceUrl]
     }
-    var read = readTest(t, {
-      "../source files/operators:+-<>%.coffee": "source code"
+    const read = readTest(t, {
+      '../source files/operators:+-<>%.coffee': 'source code'
     })
 
-    method(map, mapUrl, read, function(error) {
+    method(map, mapUrl, read, error => {
       t.error(error)
     })
-
   }
 }
 
-test(".resolveSources",     testResolveSources(sourceMapResolve.resolveSources,    false))
+test('.resolveSources', testResolveSources(sourceMapResolve.resolveSources, false))
 
-test(".resolveSourcesSync", testResolveSources(sourceMapResolve.resolveSourcesSync, true))
+test('.resolveSourcesSync', testResolveSources(sourceMapResolve.resolveSourcesSync, true))
 
-
-function testResolve(method, sync) {
-  return function(t) {
+function testResolve (method, sync) {
+  return t => {
     t.plan(3)
 
     if (sync) {
       method = asyncify(method)
     }
 
-    var map = {
+    const map = {
       sources: [sourceUrl]
     }
-    var read = readTest(t, {
-      "built files/operators map.json": JSON.stringify(map),
-      "source files/operators:+-<>%.coffee": "source code"
+    const read = readTest(t, {
+      'built files/operators map.json': JSON.stringify(map),
+      'source files/operators:+-<>%.coffee': 'source code'
     })
 
-    method(u1(mapUrl), codeUrl, read, function(error) {
+    method(u1(mapUrl), codeUrl, read, error => {
       t.error(error)
     })
-
   }
 }
 
-test(".resolve",     testResolve(sourceMapResolve.resolve,    false))
+test('.resolve', testResolve(sourceMapResolve.resolve, false))
 
-test(".resolveSync", testResolve(sourceMapResolve.resolveSync, true))
+test('.resolveSync', testResolve(sourceMapResolve.resolveSync, true))

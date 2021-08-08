@@ -1,9 +1,9 @@
 {
+  "esversion": 6,
   "bitwise": true,
   "camelcase": true,
   "curly": false,
   "eqeqeq": true,
-  "es3": true,
   "forin": true,
   "immed": false,
   "indent": false,
@@ -32,6 +32,7 @@
 
   "node": true,
   "globals": {
+    "globalThis": true,
     "describe": false,
     "it": false,
     "before": false,

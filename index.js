@@ -1,29 +1,40 @@
-var atob = require("atob")
-var urlLib = require("url")
-var pathLib = require("path")
-var decodeUriComponentLib = require("decode-uri-component")
+import urlLib from "node:url"
+import pathLib from "node:path"
+import _atob from "atob"
+import decodeUriComponentLib from "decode-uri-component"
 
+/** @type {globalThis.atob} */
+const atob = globalThis.atob || _atob
 
-
-function resolveUrl(/* ...urls */) {
-  return Array.prototype.reduce.call(arguments, function(resolved, nextUrl) {
+/** @param {any[]} args ...urls */
+function resolveUrl(...args) {
+  return Array.prototype.reduce.call(args, (resolved, nextUrl) => {
     return urlLib.resolve(resolved, nextUrl)
   })
 }
 
+/** @param {string} aPath */
 function convertWindowsPath(aPath) {
   return pathLib.sep === "\\" ? aPath.replace(/\\/g, "/").replace(/^[a-z]:\/?/i, "/") : aPath
 }
 
+/**
+ * @param {string} string
+ * @returns {string}
+ */
 function customDecodeUriComponent(string) {
   // `decodeUriComponentLib` turns `+` into ` `, but that's not wanted.
   return decodeUriComponentLib(string.replace(/\+/g, "%2B"))
 }
 
 function callbackAsync(callback, error, result) {
-  setImmediate(function() { callback(error, result) })
+  setImmediate(() => { callback(error, result) })
 }
 
+/**
+ * @param {string} string
+ * @returns {string}
+ */
 function parseMapToJSON(string, data) {
   try {
     return JSON.parse(string.replace(/^\)\]\}'/, ""))
@@ -34,7 +45,7 @@ function parseMapToJSON(string, data) {
 }
 
 function readSync(read, url, data) {
-  var readUrl = customDecodeUriComponent(url)
+  const readUrl = customDecodeUriComponent(url)
   try {
     return String(read(readUrl))
   } catch (error) {
@@ -43,32 +54,19 @@ function readSync(read, url, data) {
   }
 }
 
+const innerRegex = /[#@] sourceMappingURL=([^\s'"]*)/
 
-
-var innerRegex = /[#@] sourceMappingURL=([^\s'"]*)/
-
-var sourceMappingURLRegex = RegExp(
-  "(?:" +
-    "/\\*" +
-    "(?:\\s*\r?\n(?://)?)?" +
-    "(?:" + innerRegex.source + ")" +
-    "\\s*" +
-    "\\*/" +
-    "|" +
-    "//(?:" + innerRegex.source + ")" +
-  ")" +
-  "\\s*"
+const sourceMappingURLRegex = RegExp(
+  `(?:/\\*(?:\\s*\r?\n(?://)?)?(?:${innerRegex.source})\\s*\\*/|//(?:${innerRegex.source}))\\s*`
 )
 
 function getSourceMappingUrl(code) {
-  var match = code.match(sourceMappingURLRegex)
+  const match = code.match(sourceMappingURLRegex)
   return match ? match[1] || match[2] || "" : null
 }
 
-
-
 function resolveSourceMap(code, codeUrl, read, callback) {
-  var mapData
+  let mapData
   try {
     mapData = resolveSourceMapHelper(code, codeUrl)
   } catch (error) {
@@ -77,8 +75,8 @@ function resolveSourceMap(code, codeUrl, read, callback) {
   if (!mapData || mapData.map) {
     return callbackAsync(callback, null, mapData)
   }
-  var readUrl = customDecodeUriComponent(mapData.url)
-  read(readUrl, function(error, result) {
+  const readUrl = customDecodeUriComponent(mapData.url)
+  read(readUrl, (error, result) => {
     if (error) {
       error.sourceMapData = mapData
       return callback(error)
@@ -94,7 +92,7 @@ function resolveSourceMap(code, codeUrl, read, callback) {
 }
 
 function resolveSourceMapSync(code, codeUrl, read) {
-  var mapData = resolveSourceMapHelper(code, codeUrl)
+  const mapData = resolveSourceMapHelper(code, codeUrl)
   if (!mapData || mapData.map) {
     return mapData
   }
@@ -103,7 +101,7 @@ function resolveSourceMapSync(code, codeUrl, read) {
   return mapData
 }
 
-var dataUriRegex = /^data:([^,;]*)(;[^,;]*)*(?:,(.*))?$/
+const dataUriRegex = /^data:([^,;]*)(;[^,;]*)*(?:,(.*))?$/
 
 /**
  * The media type for JSON text is application/json.
@@ -112,7 +110,7 @@ var dataUriRegex = /^data:([^,;]*)(;[^,;]*)*(?:,(.*))?$/
  *
  * `text/json` is non-standard media type
  */
-var jsonMimeTypeRegex = /^(?:application|text)\/json$/
+const jsonMimeTypeRegex = /^(?:application|text)\/json$/
 
 /**
  * JSON text exchanged between systems that are not part of a closed ecosystem
@@ -120,50 +118,56 @@ var jsonMimeTypeRegex = /^(?:application|text)\/json$/
  *
  * {@link https://tools.ietf.org/html/rfc8259#section-8.1 | Character Encoding}
  */
-var jsonCharacterEncoding = "utf-8"
+const jsonCharacterEncoding = "utf-8"
 
+/** @param {string} b64 */
 function base64ToBuf(b64) {
-  var binStr = atob(b64)
-  var len = binStr.length
-  var arr = new Uint8Array(len)
-  for (var i = 0; i < len; i++) {
+  const binStr = atob(b64)
+  const len = binStr.length
+  const arr = new Uint8Array(len)
+  for (let i = 0; i < len; i++) {
     arr[i] = binStr.charCodeAt(i)
   }
   return arr
 }
 
+/** @param {string} b64 */
 function decodeBase64String(b64) {
   if (typeof TextDecoder === "undefined" || typeof Uint8Array === "undefined") {
     return atob(b64)
   }
-  var buf = base64ToBuf(b64);
+  const buf = base64ToBuf(b64)
   // Note: `decoder.decode` method will throw a `DOMException` with the
   // `"EncodingError"` value when an coding error is found.
-  var decoder = new TextDecoder(jsonCharacterEncoding, {fatal: true})
-  return decoder.decode(buf);
+  const decoder = new TextDecoder(jsonCharacterEncoding, {fatal: true})
+  return decoder.decode(buf)
 }
 
+/**
+ * @param {*} code
+ * @param {string} codeUrl
+ */
 function resolveSourceMapHelper(code, codeUrl) {
   codeUrl = convertWindowsPath(codeUrl)
 
-  var url = getSourceMappingUrl(code)
+  const url = getSourceMappingUrl(code)
   if (!url) {
     return null
   }
 
-  var dataUri = url.match(dataUriRegex)
+  const dataUri = url.match(dataUriRegex)
   if (dataUri) {
-    var mimeType = dataUri[1] || "text/plain"
-    var lastParameter = dataUri[2] || ""
-    var encoded = dataUri[3] || ""
-    var data = {
+    const mimeType = dataUri[1] || "text/plain"
+    const lastParameter = dataUri[2] || ""
+    const encoded = dataUri[3] || ""
+    const data = {
       sourceMappingURL: url,
       url: null,
       sourcesRelativeTo: codeUrl,
       map: encoded
     }
     if (!jsonMimeTypeRegex.test(mimeType)) {
-      var error = new Error("Unuseful data uri mime type: " + mimeType)
+      var error = new Error(`Unuseful data uri mime type: ${mimeType}`)
       error.sourceMapData = data
       throw error
     }
@@ -179,7 +183,8 @@ function resolveSourceMapHelper(code, codeUrl) {
     return data
   }
 
-  var mapUrl = resolveUrl(codeUrl, url)
+  const mapUrl = resolveUrl(codeUrl, url)
+
   return {
     sourceMappingURL: url,
     url: mapUrl,
@@ -188,39 +193,37 @@ function resolveSourceMapHelper(code, codeUrl) {
   }
 }
 
-
-
 function resolveSources(map, mapUrl, read, options, callback) {
   if (typeof options === "function") {
     callback = options
     options = {}
   }
-  var pending = map.sources ? map.sources.length : 0
-  var result = {
+  let pending = map.sources ? map.sources.length : 0;
+  const result = {
     sourcesResolved: [],
     sourcesContent:  []
-  }
+  };
 
   if (pending === 0) {
     callbackAsync(callback, null, result)
     return
   }
 
-  var done = function() {
+  const done = () => {
     pending--
     if (pending === 0) {
       callback(null, result)
     }
-  }
+  };
 
-  resolveSourcesHelper(map, mapUrl, options, function(fullUrl, sourceContent, index) {
+  resolveSourcesHelper(map, mapUrl, options, (fullUrl, sourceContent, index) => {
     result.sourcesResolved[index] = fullUrl
     if (typeof sourceContent === "string") {
       result.sourcesContent[index] = sourceContent
       callbackAsync(done, null)
     } else {
-      var readUrl = customDecodeUriComponent(fullUrl)
-      read(readUrl, function(error, source) {
+      const readUrl = customDecodeUriComponent(fullUrl);
+      read(readUrl, (error, source) => {
         result.sourcesContent[index] = error ? error : String(source)
         done()
       })
@@ -229,7 +232,7 @@ function resolveSources(map, mapUrl, read, options, callback) {
 }
 
 function resolveSourcesSync(map, mapUrl, read, options) {
-  var result = {
+  const result = {
     sourcesResolved: [],
     sourcesContent:  []
   }
@@ -238,13 +241,13 @@ function resolveSourcesSync(map, mapUrl, read, options) {
     return result
   }
 
-  resolveSourcesHelper(map, mapUrl, options, function(fullUrl, sourceContent, index) {
+  resolveSourcesHelper(map, mapUrl, options, (fullUrl, sourceContent, index) => {
     result.sourcesResolved[index] = fullUrl
     if (read !== null) {
       if (typeof sourceContent === "string") {
         result.sourcesContent[index] = sourceContent
       } else {
-        var readUrl = customDecodeUriComponent(fullUrl)
+        const readUrl = customDecodeUriComponent(fullUrl)
         try {
           result.sourcesContent[index] = String(read(readUrl))
         } catch (error) {
@@ -257,15 +260,15 @@ function resolveSourcesSync(map, mapUrl, read, options) {
   return result
 }
 
-var endingSlash = /\/?$/
+const endingSlash = /\/?$/
 
 function resolveSourcesHelper(map, mapUrl, options, fn) {
   options = options || {}
   mapUrl = convertWindowsPath(mapUrl)
-  var fullUrl
-  var sourceContent
-  var sourceRoot
-  for (var index = 0, len = map.sources.length; index < len; index++) {
+  let fullUrl
+  let sourceContent
+  let sourceRoot
+  for (let index = 0, len = map.sources.length; index < len; index++) {
     sourceRoot = null
     if (typeof options.sourceRoot === "string") {
       sourceRoot = options.sourceRoot
@@ -287,23 +290,21 @@ function resolveSourcesHelper(map, mapUrl, options, fn) {
   }
 }
 
-
-
 function resolve(code, codeUrl, read, options, callback) {
   if (typeof options === "function") {
     callback = options
     options = {}
   }
   if (code === null) {
-    var mapUrl = codeUrl
-    var data = {
+    const mapUrl = codeUrl
+    const data = {
       sourceMappingURL: null,
       url: mapUrl,
       sourcesRelativeTo: mapUrl,
       map: null
     }
-    var readUrl = customDecodeUriComponent(mapUrl)
-    read(readUrl, function(error, result) {
+    const readUrl = customDecodeUriComponent(mapUrl)
+    read(readUrl, (error, result) => {
       if (error) {
         error.sourceMapData = data
         return callback(error)
@@ -317,7 +318,7 @@ function resolve(code, codeUrl, read, options, callback) {
       _resolveSources(data)
     })
   } else {
-    resolveSourceMap(code, codeUrl, read, function(error, mapData) {
+    resolveSourceMap(code, codeUrl, read, (error, mapData) => {
       if (error) {
         return callback(error)
       }
@@ -329,7 +330,7 @@ function resolve(code, codeUrl, read, options, callback) {
   }
 
   function _resolveSources(mapData) {
-    resolveSources(mapData.map, mapData.sourcesRelativeTo, read, options, function(error, result) {
+    resolveSources(mapData.map, mapData.sourcesRelativeTo, read, options, (error, result) => {
       if (error) {
         return callback(error)
       }
@@ -341,9 +342,9 @@ function resolve(code, codeUrl, read, options, callback) {
 }
 
 function resolveSync(code, codeUrl, read, options) {
-  var mapData
+  let mapData
   if (code === null) {
-    var mapUrl = codeUrl
+    const mapUrl = codeUrl
     mapData = {
       sourceMappingURL: null,
       url: mapUrl,
@@ -358,20 +359,18 @@ function resolveSync(code, codeUrl, read, options) {
       return null
     }
   }
-  var result = resolveSourcesSync(mapData.map, mapData.sourcesRelativeTo, read, options)
+  const result = resolveSourcesSync(mapData.map, mapData.sourcesRelativeTo, read, options);
   mapData.sourcesResolved = result.sourcesResolved
   mapData.sourcesContent  = result.sourcesContent
   return mapData
 }
 
-
-
-module.exports = {
-  resolveSourceMap:     resolveSourceMap,
-  resolveSourceMapSync: resolveSourceMapSync,
-  resolveSources:       resolveSources,
-  resolveSourcesSync:   resolveSourcesSync,
-  resolve:              resolve,
-  resolveSync:          resolveSync,
-  parseMapToJSON:       parseMapToJSON
+export default {
+  resolveSourceMap,
+  resolveSourceMapSync,
+  resolveSources,
+  resolveSourcesSync,
+  resolve,
+  resolveSync,
+  parseMapToJSON
 }

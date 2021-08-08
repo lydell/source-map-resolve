@@ -3,6 +3,7 @@
   "version": "0.6.0",
   "author": "Simon Lydell",
   "license": "MIT",
+  "type": "module",
   "description": "Resolve the source map and/or sources for a generated file.",
   "keywords": [
     "source map",
