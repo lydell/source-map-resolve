@@ -4,19 +4,19 @@ Overview
 Resolve the source map and/or sources for a generated file.
 
 ```js
-var sourceMapResolve = require("source-map-resolve")
-var sourceMap        = require("source-map")
+ sourceMapResolve = require("source-map-resolve")
+ sourceMap        = require("source-map")
 
-var code = [
+ code = [
   "!function(){...}();",
   "/*# sourceMappingURL=foo.js.map */"
 ].join("\n")
 
 sourceMapResolve.resolveSourceMap(code, "/js/foo.js", fs.readFile, function(error, result) {
-  if (error) {
-    return notifyFailure(error)
+     (error) {
+          notifyFailure(error)
   }
-  result
+  
   // {
   //   map: {file: "foo.js", mappings: "...", sources: ["/coffee/foo.coffee"], names: []},
   //   url: "/js/foo.js.map",
