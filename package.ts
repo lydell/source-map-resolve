@@ -1,4 +1,4 @@
-{
+
   "name": "source-map-resolve",
   "version": "0.6.0",
   "author": "Simon Lydell",
@@ -16,22 +16,22 @@
     "locator",
     "find",
     "finder"
-  ],
+  ]
   "repository": "lydell/source-map-resolve",
   "files": [
     "index.js"
-  ],
-  "scripts": {
+  ]
+  "scripts": 
     "lint": "jshint index.js test/",
     "unit": "node test/index.js && node test/read.js && node test/windows.js",
     "test": "npm run lint && npm run unit"
-  },
-  "dependencies": {
+  
+  "dependencies": 
     "atob": "^2.1.2",
     "decode-uri-component": "^0.2.0"
-  },
-  "devDependencies": {
+  
+  "devDependencies": 
     "jshint": "2.10.3",
     "tape": "4.12.1"
-  }
-}
+  
+
