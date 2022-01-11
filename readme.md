@@ -1,3 +1,33 @@
+Deprecated
+==========
+
+Is npm bugging you about this module being deprecated? You probably depend on it via an old version of `micromatch`:
+
+```
+some-package > some-other-package > micromatch > nanomatch > snapdragon > source-map-resolve
+```
+
+In the above case, you could try:
+
+- To make `some-other-package` update to the latest version of `micromatch`, which doesn’t depend on `nanomatch` anymore.
+- To make `some-package` not depend on `some-other-package`.
+- Check that you use the latest version of `some-package`. Maybe they have already updated the deprecated stuff away!
+- Maybe your dependency chain is even longer? See if the bad stuff can be cut off at some other point.
+
+Or maybe some package you use depends on `nanomatch`? If so, try to make that package switch to `micromatch` instead.
+
+So why is `source-map-resolve` deprecated? Well, `source-map-resolve` tries to work with source maps completely in general – support every feature and be completely language agnostic. That is a cool goal, but has a couple of flaws:
+
+- Finding source map comments. This is done via regex to support any language, but in reality you need to know the language to know what a comment is, as opposed to something that _looks_ like a comment inside a string. In reality, only JS and CSS use source maps, but even then you have further problems. The source map specification is vague on exactly how to find a source map comment, and browsers differ. So what does it even mean to find _the_ source map comment of a file? You could try to reverse engineer how browsers do it, but what to do when they disagree?
+- URLs. Source maps link to source files via URLs, not file paths. But `source-map-resolve` works with file paths. How should it translate URLs to file paths? `source-map-resolve` makes assumptions and has some issues on Windows.
+- The “general” approach. The source map spec is, well, pretty under specified, so it’s difficult to decide how `source-map-resolve` should work at all.
+
+If you still find this package useful and would like to use it:
+
+- First think through if you _really_ need it. Why are you “resolving source maps” (whatever that even means)? Is there some simpler way to solve your problem? Maybe in your case you don’t have to support _everything_ because your tool only deals with JS and deals with source maps that look a certain way?
+- Copy good parts of the code.
+- Fork it. If you do, please let me know so I can link to your fork. Also note that there is a branch called [next](https://github.com/lydell/source-map-resolve/tree/next) with more modern code, from another contributor (that I shamefully never released).
+
 Overview
 ========
 
