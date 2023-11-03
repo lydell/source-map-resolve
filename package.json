@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "atob": "^2.1.2",
-    "decode-uri-component": "^0.2.0"
+    "decode-uri-component": "^0.2.2"
   },
   "devDependencies": {
     "jshint": "2.10.3",
